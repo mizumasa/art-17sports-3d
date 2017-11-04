@@ -5,9 +5,12 @@
 #include "ofxObjectHuman.h"
 #include "ofxObjectLight.h"
 #include "ofxObjectCamera.h"
+#include "ofxObjectGoal.h"
+#include "ofxObjectBall.h"
 #include "ofxGui.h"
 
 #include "ofxFboBlur.h"
+#include "ofxAssimpModelLoader.h"
 
 #define MIR_X_NUM 5
 #define MIR_X_ANG 9*1.5
@@ -62,6 +65,15 @@ public:
     
     ofxPanel gui;
     ofxIntSlider pi_AngleSpeed;
+    ofxFloatSlider pf_Buf1;
+    ofxFloatSlider pf_Buf2;
+    ofxFloatSlider pf_Buf3;
+    ofxFloatSlider pf_Buf4;
+    ofxFloatSlider pf_Buf5;
+    ofxFloatSlider pf_Buf6;
 
+    ofxAssimpModelLoader model;
+    ofxObjectGoal modelGoal;
+    ofxObjectBall modelBall;
     
 };

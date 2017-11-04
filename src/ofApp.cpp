@@ -20,7 +20,7 @@ void ofApp::setup(){
     i_Camera = 0;
     i_test = 0;
     
-    b_TestLight = false;
+    b_TestLight = true;
     
 	ofEnableLighting();
 	ofEnableDepthTest();
@@ -131,6 +131,9 @@ void ofApp::setup(){
     ofSetCylinderResolution(24, 1);
     
     
+    //model.loadModel("020512_stadium.stl");
+    model.loadModel("020512_stadium.3DS");
+    
     //FboBlur
     ofFbo::Settings s;
     s.width = ofGetWidth();
@@ -146,6 +149,12 @@ void ofApp::setup(){
 
     gui.setup();
     gui.add(pi_AngleSpeed.setup("Angle Speed", 5, 1, 10));
+    gui.add(pf_Buf1.setup("pf_Buf1", 10, -100.0, 100.0));
+    gui.add(pf_Buf2.setup("pf_Buf2", 10, -100.0, 100.0));
+    gui.add(pf_Buf3.setup("pf_Buf3", 1, 1, 100.0));
+    gui.add(pf_Buf4.setup("pf_Buf4", 1, 1, 100.0));
+    gui.add(pf_Buf5.setup("pf_Buf5", 1, 1, 100.0));
+    gui.add(pf_Buf6.setup("pf_Buf6", 1, 0.01, 10.0));
     b_GuiDraw = false;
 }
 
@@ -208,17 +217,23 @@ void ofApp::update(){
     gpuBlur.numBlurOverlays = 1;
     gpuBlur.blurOverlayGain = 255;
     
+    modelBall.update();
+
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+    ofPushStyle();
     ofEnableAlphaBlending();
-    
+    ofEnableLighting();
+    ofEnableDepthTest();
+
     float blur = ofMap(mouseX, 0, ofGetWidth(), 0, 10, true);
 
     ofBackground(0,0,0);
-    v_Camera[i_Camera].begin();
     
+
+    v_Camera[i_Camera].begin();
     
     if(b_TestLight){
         testLight.enable();
@@ -234,12 +249,33 @@ void ofApp::draw(){
         materialPlaneBlack.begin();
     }
     
+    /*
     for(int i = 0; i<v_ObjectMirror.size(); i++){
         v_ObjectMirror[i].draw(b_Render,v_Camera[i_Camera].getPosition(),v_Camera[i_Camera].getLookAtDir());
     }
     for(int i = 0; i<v_ObjectHuman.size(); i++){
         v_ObjectHuman[i].draw();
     }
+     */
+    
+    {ofPushMatrix();
+        ofScale(1.0,1.0,1.0);
+        {
+            ofPushMatrix();
+            ofRotateX(-90);
+            model.drawFaces();
+            ofPopMatrix();
+        }
+        {
+            ofPushMatrix();
+            modelGoal.draw();
+            ofPopMatrix();
+        }
+        modelBall.draw(pf_Buf1*pf_Buf3,pf_Buf4);
+    }ofPopMatrix();
+
+
+    
     
     if(b_Render){
         materialPlane.end();
@@ -250,10 +286,12 @@ void ofApp::draw(){
     for(int i = 0; i<v_ObjectLight.size(); i++){
         v_ObjectLight[i].draw();
     }
+    
 	if(!b_TestLight)areaLight.draw();
     if(b_TestLight)testLight.draw();
 
     
+    /*
     for(int i = 0; i<v_ObjectMirror.size(); i++){
         //v_ObjectMirror[i].drawLineTo(testLight.getPosition());
         //v_ObjectMirror[i].drawLineTo(testLight.getPosition());
@@ -275,7 +313,7 @@ void ofApp::draw(){
         v_ObjectMirror[i].drawLineDir(ofVec3f(0,-test.z*MIRROR_RADIUS*1.5,test.y*MIRROR_RADIUS*1.5));
         ofSetColor(0, 0, 255,90);
         v_ObjectMirror[i].drawLineDir(v_ObjectMirror[i].getReflectDir(v_ObjectLight[4].getPos())*RADIUS*2);
-    }
+    }*/
 
  
 #if 0
@@ -297,30 +335,39 @@ void ofApp::draw(){
     }
 #endif
 
+    
     v_Camera[i_Camera].end();
     
+    ofPopStyle();
+
     
     ofSetColor(255, 255, 255,255);//this color is applied to gpuBlur.beginDrawScene();
-    gpuBlur.beginDrawScene();
-    ofClear(0, 0, 0, 0);
 
-    v_Camera[i_Camera].begin();
-    ofSetColor(255, 255, 255,255);
-    for(int i = 0; i<v_ObjectMirror.size(); i++){
-        v_ObjectMirror[i].drawLineTo(v_ObjectLight[4].getPos());
-        //v_ObjectMirror[i].drawLineTo(v_ObjectLight[7].getPos());
-    }
-    v_Camera[i_Camera].end();
-    
-    gpuBlur.endDrawScene();
-    gpuBlur.performBlur();
-    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA); //pre-multiplied alpha
-    gpuBlur.drawBlurFbo();
-    
     if(b_GuiDraw){
+        ofPushStyle();
+        ofDisableLighting();
+        ofDisableDepthTest();
+        ofSetColor(255, 255, 255,255);
         gui.draw();
+        ofPopStyle();
+    }else{
+        gpuBlur.beginDrawScene();
+        ofClear(0, 0, 0, 0);
+        
+        v_Camera[i_Camera].begin();
+        ofSetColor(255, 255, 255,255);
+        for(int i = 0; i<v_ObjectMirror.size(); i++){
+            v_ObjectMirror[i].drawLineTo(v_ObjectLight[4].getPos());
+            //v_ObjectMirror[i].drawLineTo(v_ObjectLight[7].getPos());
+        }
+        v_Camera[i_Camera].end();
+        
+        gpuBlur.endDrawScene();
+        gpuBlur.performBlur();
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA); //pre-multiplied alpha
+        gpuBlur.drawBlurFbo();
+
     }
-    
 }
 
 //--------------------------------------------------------------
@@ -338,6 +385,9 @@ void ofApp::keyPressed(int key){
             break;
         case 'g':
             b_GuiDraw = !b_GuiDraw;
+            break;
+        case 'j':
+            modelBall.setSpeed(ofVec3f(0,0,5));
             break;
         case OF_KEY_UP:
             for(int i = 0; i<v_ObjectMirror.size(); i++){
