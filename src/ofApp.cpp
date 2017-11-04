@@ -218,6 +218,8 @@ void ofApp::update(){
     gpuBlur.blurOverlayGain = 255;
     
     modelBall.update();
+    objectEffect.update();
+
 
 }
 
@@ -360,6 +362,7 @@ void ofApp::draw(){
             v_ObjectMirror[i].drawLineTo(v_ObjectLight[4].getPos());
             //v_ObjectMirror[i].drawLineTo(v_ObjectLight[7].getPos());
         }
+        objectEffect.draw();
         v_Camera[i_Camera].end();
         
         gpuBlur.endDrawScene();
@@ -373,6 +376,9 @@ void ofApp::draw(){
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
 	switch(key){
+        case 'e':
+            objectEffect.add(ofVec3f(ofRandom(-80,80),ofRandom(-120,100),GROUND_LEVEL));
+            break;
         case 't':
             b_TestLight = !b_TestLight;
             break;

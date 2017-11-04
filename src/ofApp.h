@@ -7,7 +7,9 @@
 #include "ofxObjectCamera.h"
 #include "ofxObjectGoal.h"
 #include "ofxObjectBall.h"
+#include "ofxObjectEffect.h"
 #include "ofxGui.h"
+#include "common.h"
 
 #include "ofxFboBlur.h"
 #include "ofxAssimpModelLoader.h"
@@ -21,6 +23,7 @@
 #define SIZE 10
 
 #define RADIUS 700
+
 
 class ofApp : public ofBaseApp{
 public:
@@ -75,5 +78,7 @@ public:
     ofxAssimpModelLoader model;
     ofxObjectGoal modelGoal;
     ofxObjectBall modelBall;
+    
+    ofxObjectEffects objectEffect;
     
 };

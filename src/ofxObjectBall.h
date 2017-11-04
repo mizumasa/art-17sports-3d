@@ -7,6 +7,8 @@
 #define __ofxObjectBall__
 
 #include "ofMain.h"
+#include "common.h"
+
 #include "ofxAssimpModelLoader.h"
 
 class ofxObjectBall{

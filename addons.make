@@ -1,4 +1,5 @@
 ofxAVString
+ofxAssimpModelLoader
 ofxBlur
 ofxDelaunay
 ofxFboBlur
