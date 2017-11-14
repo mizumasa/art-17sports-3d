@@ -13,10 +13,14 @@ ofxObjectBall::ofxObjectBall(){
 //--------------------------------------------------------------
 void ofxObjectBall::update(){
     vf_Speed += vf_Gravity;
+    vf_Speed -= vf_Speed/80.0;
     vf_Rotate += vf_RotateSpeed;
     vf_Pos += vf_Speed;
     if(vf_Pos[2]<GROUND_LEVEL){
         vf_Pos[2] = GROUND_LEVEL;
+    }
+    if(vf_Pos[1]>COURT_HEIGHT_HALF){
+        vf_Speed[1] = -vf_Speed[1];
     }
 }
 
@@ -24,8 +28,14 @@ void ofxObjectBall::setSpeed(ofVec3f _vf_Speed){
     vf_Speed = _vf_Speed;
 }
 
+void ofxObjectBall::throwTo(ofVec3f _vf_Pos, float _speed){
+    vf_Speed = (_vf_Pos - vf_Pos);
+    vf_Speed = _speed * vf_Speed / vf_Speed.length();
+}
+
+
 //--------------------------------------------------------------
-void ofxObjectBall::draw(float f,float f2){
+void ofxObjectBall::draw(){
     ofPushMatrix();
     ofPushStyle();
     ofSetColor(255, 255, 255);

@@ -16,6 +16,7 @@
  */
 //--------------------------------------------------------------
 void ofApp::setup(){
+    i_SceneID = 1;
     b_Render = false;
     i_Camera = 0;
     i_test = 0;
@@ -59,10 +60,14 @@ void ofApp::setup(){
 	plane.rotate(-90,ofVec3f(1,0,0));
 	plane.move(ofVec3f(0,-300,0));
 	
-    materialPlane.setAmbientColor(ofFloatColor(0,0,0,1.0));
-	materialPlane.setDiffuseColor(ofFloatColor(0.1,0.1,0.1,1.0));
-	materialPlane.setSpecularColor(ofFloatColor(1.0,1.0,1.0,1.0));
-	materialPlane.setShininess(100000);
+    //materialPlane.setAmbientColor(ofFloatColor(0,0,0,1.0));
+	//materialPlane.setDiffuseColor(ofFloatColor(0.1,0.1,0.1,1.0));
+	//materialPlane.setSpecularColor(ofFloatColor(1.0,1.0,1.0,1.0));
+    //materialPlane.setShininess(100000);
+    materialPlane.setAmbientColor(ofFloatColor(0,0,0,0.0));
+    materialPlane.setDiffuseColor(ofFloatColor(0.0,0.0,0.0,0.0));
+    materialPlane.setSpecularColor(ofFloatColor(0.0,0.0,0.0,0.0));
+    materialPlane.setShininess(100000);
     
     materialPlaneBlack.setAmbientColor(ofFloatColor(0.4,0.4,0.4,0.0));
     materialPlaneBlack.setDiffuseColor(ofFloatColor(0.0,0.0,0.0,0.0));
@@ -133,6 +138,7 @@ void ofApp::setup(){
     
     //model.loadModel("020512_stadium.stl");
     model.loadModel("020512_stadium.3DS");
+    imgCourt.load("groundc.jpg");
     
     //FboBlur
     ofFbo::Settings s;
@@ -156,33 +162,28 @@ void ofApp::setup(){
     gui.add(pf_Buf5.setup("pf_Buf5", 1, 1, 100.0));
     gui.add(pf_Buf6.setup("pf_Buf6", 1, 0.01, 10.0));
     b_GuiDraw = false;
+    
+    gpuBlur.blurOffset = 24;
+    gpuBlur.blurPasses = 9.5;
+    gpuBlur.numBlurOverlays = 1;
+    gpuBlur.blurOverlayGain = 255;
+    
+    if(USE_BLACKMAGIC){
+        cam.setup(BLACKMAGIC_W, BLACKMAGIC_H, 30);
+    }else{
+        camMac.setDeviceID(0);
+        camMac.setDesiredFrameRate(60);
+        camMac.initGrabber(WEBCAM_W, WEBCAM_H);
+    }
+    b_CamStart = false;
+
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
 	//areaLight.setPosition(0,-200,0);
     for(int i = 0; i<v_ObjectMirror.size(); i++){
-        //cout << i << endl;
         v_ObjectMirror[i].update(pi_AngleSpeed);
-        //v_ObjectMirror[i].setAngleBetween(testLight.getPosition(), camera.getPosition());
-        //v_ObjectMirror[i].setAngleBetween(areaLight.getPosition(), testLight.getPosition() );
-        
-        //v_ObjectMirror[i].setAngleBetween(areaLight.getPosition(), camera.getPosition());
-        //v_ObjectMirror[i].setAngleBetween(areaLight.getPosition(), v_ObjectMirror[i].getPos()+ofVec3f(0,-200,0));
-        
-        
-        /*
-        if(b_Render){
-            v_ObjectMirror[i].setAngleBetween(areaLight.getPosition(), v_ObjectMirror[i].getPos()-v_Camera[i_Camera].getLookAtDir());
-        }else{
-            //v_ObjectMirror[i].setAngleBetween(areaLight.getPosition(), v_Camera[i_Camera].getPosition());
-            //v_ObjectMirror[i].setAngleBetween(areaLight.getPosition(), v_Camera[0].getPosition());
-            v_ObjectMirror[i].setAngleBetween(v_ObjectHuman[4].getPos(), v_ObjectLight[7].getPos());
-        }*/
-        
-        
-        //v_ObjectMirror[i].setAngleBetween(areaLight.getPosition(), ofVec3f(-1000, -00, 700));
-        //v_ObjectMirror[i].setAngleBetween(testLight.getPosition(), areaLight.getPosition());
     }
     for(int i = 0; i<v_ObjectHuman.size(); i++){
         v_ObjectHuman[i].update(pi_AngleSpeed);
@@ -193,8 +194,6 @@ void ofApp::update(){
     for(int i = 0; i<v_Camera.size(); i++){
         v_Camera[i].update();
     }
-
-    
     if(b_UpdateFbo){
         b_UpdateFbo = false;
         ofFbo::Settings s;
@@ -209,22 +208,63 @@ void ofApp::update(){
         s.useStencil = false;
         gpuBlur.setup(s, false);
     }
-
-    gpuBlur.blurOffset = 130 * ofMap(mouseY, 0, ofGetHeight(), 1, 0, true);
-    gpuBlur.blurOffset = 4;
-    gpuBlur.blurPasses = 10 * ofMap(mouseX, 0, ofGetWidth(), 0, 1, true);
-    gpuBlur.blurPasses = 9.5;
-    gpuBlur.numBlurOverlays = 1;
-    gpuBlur.blurOverlayGain = 255;
+    
     
     modelBall.update();
     objectEffect.update();
+
+    if(USE_BLACKMAGIC){
+        if(cam.update()){
+            timer.tick();
+            b_CamStart=true;
+            camPixels=cam.getColorPixels();
+            camImg.setFromPixels(camPixels.getData(), BLACKMAGIC_W, BLACKMAGIC_H, OF_IMAGE_COLOR_ALPHA);
+        }
+    }else{
+        camMac.update();
+        b_CamStart=true;
+        camPixels = camMac.getPixels();
+        camPixels.resize( BLACKMAGIC_W, BLACKMAGIC_H);
+        camImg.setFromPixels(camPixels.getData(), BLACKMAGIC_W, BLACKMAGIC_H, OF_IMAGE_COLOR);
+    }
 
 
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+    switch(i_SceneID){
+        case 1:
+            draw3D();
+            break;
+        case 2:
+            drawInput();
+            break;
+        case 3:
+            break;
+        case 4:
+            break;
+        default:
+            break;
+    }
+}
+
+//--------------------------------------------------------------
+void ofApp::drawInput(){
+    ofBackground(0,0,0);
+    if(b_CamStart){
+        ofPushStyle();
+        ofPushMatrix();
+        int drawHeight;
+        drawHeight = int(ofGetWidth()*camImg.getHeight()/camImg.getWidth());
+        camImg.draw(0,int((ofGetHeight()-drawHeight)/2),-2, ofGetWidth(), drawHeight);
+        ofPushMatrix();
+        ofPushStyle();
+    }
+}
+
+//--------------------------------------------------------------
+void ofApp::draw3D(){
     ofPushStyle();
     ofEnableAlphaBlending();
     ofEnableLighting();
@@ -251,30 +291,51 @@ void ofApp::draw(){
         materialPlaneBlack.begin();
     }
     
-    /*
-    for(int i = 0; i<v_ObjectMirror.size(); i++){
-        v_ObjectMirror[i].draw(b_Render,v_Camera[i_Camera].getPosition(),v_Camera[i_Camera].getLookAtDir());
-    }
-    for(int i = 0; i<v_ObjectHuman.size(); i++){
-        v_ObjectHuman[i].draw();
-    }
-     */
-    
-    {ofPushMatrix();
-        ofScale(1.0,1.0,1.0);
+    ofPushMatrix();
+    {
+        //ofScale(1.0,1.0,1.0);
         {
+            testLight.disable();
+            areaLight.disable();
+            ofPushStyle();
             ofPushMatrix();
+            ofTranslate(4.5, 0,0);
             ofRotateX(-90);
+            ofSetColor(128, 128, 128, 128);
             model.drawFaces();
             ofPopMatrix();
+            ofPopStyle();
+
+            if(b_TestLight){
+                testLight.enable();
+                areaLight.disable();
+            }else{
+                testLight.disable();
+                areaLight.enable();
+            }
+
         }
         {
             ofPushMatrix();
             modelGoal.draw();
             ofPopMatrix();
         }
-        modelBall.draw(pf_Buf1*pf_Buf3,pf_Buf4);
-    }ofPopMatrix();
+        {
+            ofPushMatrix();
+            modelBall.draw();
+            ofPopMatrix();
+        }
+        {
+            ofPushMatrix();
+            ofTranslate(0, 0,GROUND_LEVEL);
+            camImg.draw(-COURT_WIDTH_HALF, -COURT_HEIGHT_HALF, COURT_WIDTH_HALF*2, 2*COURT_HEIGHT_HALF);
+            ofSetColor(128, 128, 128, 128);
+            ofTranslate(0, 0, 1);
+            imgCourt.draw(-COURT_WIDTH_HALF, -COURT_HEIGHT_HALF, COURT_WIDTH_HALF*2, 2*COURT_HEIGHT_HALF);
+            ofPopMatrix();
+        }
+    }
+    ofPopMatrix();
 
 
     
@@ -291,31 +352,6 @@ void ofApp::draw(){
     
 	if(!b_TestLight)areaLight.draw();
     if(b_TestLight)testLight.draw();
-
-    
-    /*
-    for(int i = 0; i<v_ObjectMirror.size(); i++){
-        //v_ObjectMirror[i].drawLineTo(testLight.getPosition());
-        //v_ObjectMirror[i].drawLineTo(testLight.getPosition());
-        //v_ObjectMirror[i].drawLineTo(v_Camera[0].getPosition());
-        if(!b_Render){
-            ofSetColor(10, 0, 200,200);
-            ofVec3f MirrorPos;
-            //MirrorPos = v_ObjectMirror[i].getMirrorPos(areaLight.getPosition());
-            MirrorPos = v_ObjectMirror[i].getMirrorPos(v_ObjectLight[4].getPos());
-            v_ObjectMirror[i].drawLineTo(MirrorPos);
-            ofSetColor(255);
-            ofDrawSphere(MirrorPos, 10);
-        }
-        ofSetColor(200,200,200,150);
-        v_ObjectMirror[i].drawNorm();
-        ofVec3f test;
-        test =v_ObjectMirror[i].getNorm();
-        v_ObjectMirror[i].drawLineDir(ofVec3f(test.y*MIRROR_RADIUS*1.5,-test.x*MIRROR_RADIUS*1.5,0));
-        v_ObjectMirror[i].drawLineDir(ofVec3f(0,-test.z*MIRROR_RADIUS*1.5,test.y*MIRROR_RADIUS*1.5));
-        ofSetColor(0, 0, 255,90);
-        v_ObjectMirror[i].drawLineDir(v_ObjectMirror[i].getReflectDir(v_ObjectLight[4].getPos())*RADIUS*2);
-    }*/
 
  
 #if 0
@@ -352,6 +388,10 @@ void ofApp::draw(){
         ofSetColor(255, 255, 255,255);
         gui.draw();
         ofPopStyle();
+        ofSetColor(255, 255, 255,255);
+        string msg;
+        msg = ofToString(ofGetFrameRate());
+        ofDrawBitmapString(msg, 200, 20);
     }else{
         gpuBlur.beginDrawScene();
         ofClear(0, 0, 0, 0);
@@ -393,7 +433,8 @@ void ofApp::keyPressed(int key){
             b_GuiDraw = !b_GuiDraw;
             break;
         case 'j':
-            modelBall.setSpeed(ofVec3f(0,0,5));
+            //modelBall.setSpeed(ofVec3f(0,0,5));
+            modelBall.throwTo(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT),20);
             break;
         case OF_KEY_UP:
             for(int i = 0; i<v_ObjectMirror.size(); i++){
@@ -406,10 +447,24 @@ void ofApp::keyPressed(int key){
             break;
         case OF_KEY_RIGHT:
             break;
+            
+        case '1':
+            i_SceneID = 1;
+            break;
         case '2':
+            i_SceneID = 2;
+            break;
+        case '3':
+            i_SceneID = 3;
+            break;
+        case '4':
+            i_SceneID = 4;
+            break;
+
+        case '0':
             i_test += 1;
             break;
-        case '1':
+        case '9':
             i_test -= 1;
             break;
         case 'c':
@@ -474,4 +529,9 @@ void ofApp::gotMessage(ofMessage msg){
 //--------------------------------------------------------------
 void ofApp::dragEvent(ofDragInfo dragInfo){ 
 
+}
+void ofApp::exit(){
+    if(USE_BLACKMAGIC){
+        cam.close();
+    }
 }

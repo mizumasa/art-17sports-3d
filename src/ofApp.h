@@ -9,10 +9,19 @@
 #include "ofxObjectBall.h"
 #include "ofxObjectEffect.h"
 #include "ofxGui.h"
+#include "ofxBlackMagic.h"
 #include "common.h"
+
+#include "ofxTimeLine.h"
 
 #include "ofxFboBlur.h"
 #include "ofxAssimpModelLoader.h"
+
+#define USE_BLACKMAGIC 0
+#define BLACKMAGIC_W 1920
+#define BLACKMAGIC_H 1080
+#define WEBCAM_W 1280
+#define WEBCAM_H 720
 
 #define MIR_X_NUM 5
 #define MIR_X_ANG 9*1.5
@@ -25,12 +34,50 @@
 #define RADIUS 700
 
 
+class RateTimer {
+protected:
+    float lastTick, averagePeriod, smoothing;
+    bool secondTick;
+public:
+    RateTimer() :
+    smoothing(.9) {
+        reset();
+    }
+    void reset() {
+        lastTick = 0, averagePeriod = 0, secondTick = false;
+    }
+    void setSmoothing(float smoothing) {
+        this->smoothing = smoothing;
+    }
+    float getFramerate() {
+        return averagePeriod == 0 ? 0 : 1 / averagePeriod;
+    }
+    void tick() {
+        float curTick = ofGetElapsedTimef();
+        if(lastTick == 0) {
+            secondTick = true;
+        } else {
+            float curDiff = curTick - lastTick;;
+            if(secondTick) {
+                averagePeriod = curDiff;
+                secondTick = false;
+            } else {
+                averagePeriod = ofLerp(curDiff, averagePeriod, smoothing);
+            }
+        }
+        lastTick = curTick;
+    }
+};
+
 class ofApp : public ofBaseApp{
 public:
 
     void setup();
     void update();
     void draw();
+    void drawInput();
+    void draw3D();
+    void exit();
     void keyPressed(int key);
     void keyReleased(int key);
     void mouseMoved(int x, int y );
@@ -76,9 +123,21 @@ public:
     ofxFloatSlider pf_Buf6;
 
     ofxAssimpModelLoader model;
+    ofImage imgCourt;
     ofxObjectGoal modelGoal;
     ofxObjectBall modelBall;
     
     ofxObjectEffects objectEffect;
     
+    ofxTimeLine timeline;
+    int i_SceneID;
+
+    ofxBlackMagic cam;
+    ofVideoGrabber camMac;
+    RateTimer timer;
+    ofPixels camPixels;
+    ofImage camImg;
+    bool b_CamStart;
+
 };
+

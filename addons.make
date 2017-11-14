@@ -1,5 +1,6 @@
 ofxAVString
 ofxAssimpModelLoader
+ofxBlackmagic
 ofxBlur
 ofxDelaunay
 ofxFboBlur

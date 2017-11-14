@@ -14,9 +14,10 @@
 class ofxObjectBall{
 public:
     ofxObjectBall();
-    void draw(float f,float f2);
+    void draw();
     void update();
     void setSpeed(ofVec3f _vf_Speed);
+    void throwTo(ofVec3f _vf_Pos, float _speed);
 private:
     ofxAssimpModelLoader model;
     ofVec3f vf_Gravity;
