@@ -14,6 +14,9 @@ class ofxObjectLight :public ofxObjectParent{
 public:
     ofxObjectLight();
     void draw();
+    void disable();
+    void enable();
+    
     virtual void setPos(float _f_Pan,float _f_Tilt,float _f_Distance);
     /*
      In this case

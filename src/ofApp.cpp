@@ -37,7 +37,9 @@ void ofApp::setup(){
     ///testLight.setAmbientColor(ofFloatColor(1.0,0.2,0.2));
     //testLight.setAttenuation(1.0,1.0,1.0);
     //testLight.setDiffuseColor(ofFloatColor(0.5,0.5,0.5));
-    testLight.setSpecularColor(ofFloatColor(1.0f, 0.0f, 0.0f));
+    testLight.setAmbientColor(ofFloatColor(0.1,0.1,0.1,1.0));
+    testLight.setDiffuseColor(ofFloatColor(0.4,0.4,0.4));
+    testLight.setSpecularColor(ofFloatColor(1.0f, 1.0f, 1.0f));
     testLight.setPosition(RADIUS/sqrt(2.0), -RADIUS/sqrt(2.0),0);
     //testLight.lookAt(ofVec3f(0,0,0));
     
@@ -48,26 +50,26 @@ void ofApp::setup(){
     //areaLight.setSpotlight(5,0);
     areaLight.setSpotlight(180,1);
     
-    areaLight.setAmbientColor(ofFloatColor(0,0,0));
+    areaLight.setAmbientColor(ofFloatColor(0.1,0.1,0.1,1.0));
 	//areaLight.setAttenuation(1.0,1.0,1.0);
-	areaLight.setDiffuseColor(ofFloatColor(0.01,0.01,0.01));
+	areaLight.setDiffuseColor(ofFloatColor(0.2,0.2,0.2));
     //areaLight.setDiffuseColor(ofFloatColor(0.0,0.0,0.0));
-    areaLight.setSpecularColor(ofFloatColor(1,1,1));
-	areaLight.setPosition(0,-RADIUS,0);
+    areaLight.setSpecularColor(ofFloatColor(0.4,0.4,0.4));
+	areaLight.setPosition(RADIUS,-RADIUS,RADIUS);
     areaLight.lookAt(ofVec3f(0,0,0), ofVec3f(0,0,1));
 	
     plane.set(400,400,2,2);
 	plane.rotate(-90,ofVec3f(1,0,0));
 	plane.move(ofVec3f(0,-300,0));
 	
-    //materialPlane.setAmbientColor(ofFloatColor(0,0,0,1.0));
-	//materialPlane.setDiffuseColor(ofFloatColor(0.1,0.1,0.1,1.0));
-	//materialPlane.setSpecularColor(ofFloatColor(1.0,1.0,1.0,1.0));
-    //materialPlane.setShininess(100000);
-    materialPlane.setAmbientColor(ofFloatColor(0,0,0,0.0));
-    materialPlane.setDiffuseColor(ofFloatColor(0.0,0.0,0.0,0.0));
-    materialPlane.setSpecularColor(ofFloatColor(0.0,0.0,0.0,0.0));
+    materialPlane.setAmbientColor(ofFloatColor(0.2,0.2,0.2,1.0));
+	materialPlane.setDiffuseColor(ofFloatColor(0.1,0.1,0.1,1.0));
+	materialPlane.setSpecularColor(ofFloatColor(1.0,1.0,1.0,1.0));
     materialPlane.setShininess(100000);
+    //materialPlane.setAmbientColor(ofFloatColor(0,0,0,0.0));
+    //materialPlane.setDiffuseColor(ofFloatColor(0.0,0.0,0.0,0.0));
+    //materialPlane.setSpecularColor(ofFloatColor(0.0,0.0,0.0,0.0));
+    //materialPlane.setShininess(100000);
     
     materialPlaneBlack.setAmbientColor(ofFloatColor(0.4,0.4,0.4,0.0));
     materialPlaneBlack.setDiffuseColor(ofFloatColor(0.0,0.0,0.0,0.0));
@@ -91,6 +93,17 @@ void ofApp::setup(){
         camBuf.setPosition(RADIUS/sqrt(2.0), -RADIUS/sqrt(2.0),0);
         camBuf.lookAt(ofVec3f(0,RADIUS,0), ofVec3f(0,0,1));
         camBuf.setFov(50);
+        v_Camera.push_back(camBuf);
+    }
+    {
+        ofxObjectCamera camBuf;
+        //camBuf.enableOrtho();
+        camBuf.setPosition(0,0,GOAL_HEIGHT);
+        camBuf.setDistance(GOAL_HEIGHT);
+        camBuf.lookAt(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT), ofVec3f(0,0,1));
+        camBuf.setFov(50);
+        //camBuf.setNearClip(0);
+        camBuf.setFarClip(20000);
         v_Camera.push_back(camBuf);
     }
     {
@@ -125,6 +138,7 @@ void ofApp::setup(){
     for(int i = -(MIR_X_NUM/2) ;i<=(MIR_X_NUM/2) ;i++){
         for(int j = 0 ;j<=(MIR_Y_NUM/2) ;j++){
             ofxObjectLight bufLight;
+            bufLight.disable();
             bufLight.setPos(180+i*MIR_X_ANG, j*MIR_Y_ANG, RADIUS);
             v_ObjectLight.push_back(bufLight);
         }
@@ -295,24 +309,25 @@ void ofApp::draw3D(){
     {
         //ofScale(1.0,1.0,1.0);
         {
-            testLight.disable();
-            areaLight.disable();
+            //testLight.disable();
+            //areaLight.disable();
+
             ofPushStyle();
             ofPushMatrix();
             ofTranslate(4.5, 0,0);
             ofRotateX(-90);
-            ofSetColor(128, 128, 128, 128);
+            ofSetColor(0, 0, 0, 128);
             model.drawFaces();
             ofPopMatrix();
             ofPopStyle();
 
-            if(b_TestLight){
+            /*if(b_TestLight){
                 testLight.enable();
                 areaLight.disable();
             }else{
                 testLight.disable();
                 areaLight.enable();
-            }
+            }*/
 
         }
         {
@@ -469,7 +484,7 @@ void ofApp::keyPressed(int key){
             break;
         case 'c':
             //b_Camera = !b_Camera;
-            i_Camera = (i_Camera +1)%3;
+            i_Camera = (i_Camera +1)%v_Camera.size();
             for(int i = 0;i<v_Camera.size();i++){
                 if(i_Camera == i){
                     v_Camera[i].enableMouseInput();

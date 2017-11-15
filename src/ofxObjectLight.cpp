@@ -19,6 +19,15 @@ void ofxObjectLight::setPos(float _f_Pan,float _f_Tilt,float _f_Distance){
     light.lookAt(ofVec3f(0,0,0), ofVec3f(0,0,1));
 }
 //--------------------------------------------------------------
+void ofxObjectLight::enable(){
+    light.enable();
+}
+//--------------------------------------------------------------
+void ofxObjectLight::disable(){
+    light.disable();
+}
+
+//--------------------------------------------------------------
 void ofxObjectLight::draw(){
     ofPushMatrix();
     ofPushStyle();
