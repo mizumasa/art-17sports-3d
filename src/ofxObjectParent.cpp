@@ -53,6 +53,16 @@ void ofxObjectParent::drawLineTo(ofVec3f _pos){
 void ofxObjectParent::drawLineDir(ofVec3f _direction){
     ofDrawLine(vf_Pos, vf_Pos+_direction);
 }
+void ofxObjectParent::drawLineDirMulti(ofVec3f _direction){
+    //ofDrawLine(vf_Pos, vf_Pos+_direction);
+    int x = 3;
+    int y = 3;
+    for(int i = -x; i <= x ;i++){
+        for(int j = -y; j <= y ;j++){
+            ofDrawLine(vf_Pos, vf_Pos+_direction+ofVec3f(i*10,0,j*10.0));
+        }
+    }
+}
 
 
 //--------------------------------------------------------------

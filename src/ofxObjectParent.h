@@ -16,6 +16,7 @@ public:
     void update(int _i_AngleSpeed);
     void drawLineTo(ofVec3f _pos);
     void drawLineDir(ofVec3f _direction);
+    void drawLineDirMulti(ofVec3f _direction);
     virtual void setPos(float _f_Pan,float _f_Tilt,float _f_Distance);
     ofVec3f getPos();
     ofVec3f getNorm();

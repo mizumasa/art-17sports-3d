@@ -8,10 +8,10 @@
 
 #include "ofMain.h"
 
-#define MOVE_RADIUS_MIN 300
-#define MOVE_RADIUS_MAX 500
-#define MOVE_RADIUS_MIN2 1000
-#define MOVE_RADIUS_MAX2 1400
+#define MOVE_RADIUS_MIN 150
+#define MOVE_RADIUS_MAX 250
+#define MOVE_RADIUS_MIN2 500
+#define MOVE_RADIUS_MAX2 700
 #define MOVE_CUT_COUNT 120
 
 class ofxObjectCamera :public ofEasyCam{

@@ -11,6 +11,7 @@
 #include "ofxGui.h"
 #include "ofxBlackMagic.h"
 #include "common.h"
+#include "ofxOsc.h"
 
 #include "ofxTimeLine.h"
 
@@ -105,7 +106,8 @@ public:
     vector<ofxObjectMirror> v_ObjectMirror;
     vector<ofxObjectHuman> v_ObjectHuman;
     vector<ofxObjectLight> v_ObjectLight;
-    
+    vector<ofxObjectLight> v_ObjectLight2;
+
     int i_Camera;
     bool b_Render;
     
@@ -126,7 +128,8 @@ public:
     ofImage imgCourt;
     ofxObjectGoal modelGoal;
     ofxObjectBall modelBall;
-    
+    ofxObjectBall modelGoalBall;//goal boal
+
     ofxObjectEffects objectEffect;
     
     ofxTimeLine timeline;
@@ -139,5 +142,6 @@ public:
     ofImage camImg;
     bool b_CamStart;
 
+    ofxOscReceiver receiver;
 };
 

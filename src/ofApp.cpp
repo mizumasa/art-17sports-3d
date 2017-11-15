@@ -21,7 +21,7 @@ void ofApp::setup(){
     i_Camera = 0;
     i_test = 0;
     
-    b_TestLight = true;
+    b_TestLight = false;
     
 	ofEnableLighting();
 	ofEnableDepthTest();
@@ -50,12 +50,12 @@ void ofApp::setup(){
     //areaLight.setSpotlight(5,0);
     areaLight.setSpotlight(180,1);
     
-    areaLight.setAmbientColor(ofFloatColor(0.1,0.1,0.1,1.0));
+    areaLight.setAmbientColor(ofFloatColor(0.01,0.01,0.01,1.0));
 	//areaLight.setAttenuation(1.0,1.0,1.0);
 	areaLight.setDiffuseColor(ofFloatColor(0.2,0.2,0.2));
     //areaLight.setDiffuseColor(ofFloatColor(0.0,0.0,0.0));
     areaLight.setSpecularColor(ofFloatColor(0.4,0.4,0.4));
-	areaLight.setPosition(RADIUS,-RADIUS,RADIUS);
+	areaLight.setPosition(RADIUS,-RADIUS,0);
     areaLight.lookAt(ofVec3f(0,0,0), ofVec3f(0,0,1));
 	
     plane.set(400,400,2,2);
@@ -140,8 +140,16 @@ void ofApp::setup(){
             ofxObjectLight bufLight;
             bufLight.disable();
             bufLight.setPos(180+i*MIR_X_ANG, j*MIR_Y_ANG, RADIUS);
+            bufLight.setAngle(i*MIR_X_ANG, -j*MIR_Y_ANG);
             v_ObjectLight.push_back(bufLight);
         }
+    }
+    for(int i = 0;i<4 ;i++){
+        ofxObjectLight bufLight;
+        bufLight.disable();
+        bufLight.setPos(180, 0, 100);
+        bufLight.setAngle(0, 0);
+        v_ObjectLight2.push_back(bufLight);
     }
     for(int i = 0; i<v_ObjectMirror.size(); i++){
         v_ObjectMirror[i].setAngleBetween(v_ObjectLight[4].getPos(), v_Camera[0].getPosition());
@@ -190,7 +198,9 @@ void ofApp::setup(){
         camMac.initGrabber(WEBCAM_W, WEBCAM_H);
     }
     b_CamStart = false;
-
+    modelGoalBall.noGravity();
+    modelGoalBall.setGoalLoop();
+    receiver.setup(PORT);
 }
 
 //--------------------------------------------------------------
@@ -225,6 +235,7 @@ void ofApp::update(){
     
     
     modelBall.update();
+    modelGoalBall.update();
     objectEffect.update();
 
     if(USE_BLACKMAGIC){
@@ -242,7 +253,17 @@ void ofApp::update(){
         camImg.setFromPixels(camPixels.getData(), BLACKMAGIC_W, BLACKMAGIC_H, OF_IMAGE_COLOR);
     }
 
-
+    while(receiver.hasWaitingMessages()){
+        ofxOscMessage m;
+        receiver.getNextMessage(&m);
+        if(m.getAddress() == "/mouse/position"){
+            int recX,recY;
+            recX = m.getArgAsInt32(0);
+            recY = m.getArgAsInt32(1);
+            cout << recX << ":"<< recY << endl;
+        }
+    }
+    
 }
 
 //--------------------------------------------------------------
@@ -337,7 +358,12 @@ void ofApp::draw3D(){
         }
         {
             ofPushMatrix();
-            modelBall.draw();
+            if(i_Camera==2){
+                //ofTranslate(0,pf_Buf6 * (pf_Buf3+pf_Buf4),pf_Buf6*pf_Buf5);
+                modelGoalBall.draw();
+            }else{
+                modelBall.draw();
+            }
             ofPopMatrix();
         }
         {
@@ -417,6 +443,31 @@ void ofApp::draw3D(){
             v_ObjectMirror[i].drawLineTo(v_ObjectLight[4].getPos());
             //v_ObjectMirror[i].drawLineTo(v_ObjectLight[7].getPos());
         }
+        if(0){
+            for(int i = 0; i<v_ObjectLight.size(); i++){
+                v_ObjectLight[i].drawLineDirMulti(v_ObjectLight[i].getNorm()*800);
+            }
+        }
+        for(int i = 0; i<v_ObjectLight2.size(); i++){
+            ofPushMatrix();
+            ofTranslate((i%2)*200-100, int(i/2)*300-150);
+            ofRotateZ(int(i/2)*180.0);
+            if(i==1 or i==2){
+                ofRotateZ(20.0);
+            }else{
+                ofRotateZ(-20.0);
+            }
+            ofRotateX(-20.0);
+            v_ObjectLight2[i].drawLineDirMulti(v_ObjectLight2[i].getNorm()*250);
+            ofPopMatrix();
+        }
+
+        /*for(int i = 0; i<v_ObjectLight.size(); i++){
+            for(int j = 0; j<v_ObjectMirror.size(); j++){
+                v_ObjectMirror[j].drawLineTo(v_ObjectLight[i].getPos());
+                //v_ObjectLight[i].drawLineDirMulti(v_ObjectLight[i].getNorm()*100);
+            }
+        }*/
         objectEffect.draw();
         v_Camera[i_Camera].end();
         
