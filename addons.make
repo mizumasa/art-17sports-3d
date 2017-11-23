@@ -8,3 +8,4 @@ ofxGui
 ofxJSON
 ofxOsc
 ofxPostGlitch
+ofxSPK

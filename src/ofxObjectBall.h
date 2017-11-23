@@ -19,6 +19,7 @@ public:
     void setSpeed(ofVec3f _vf_Speed);
     void throwTo(ofVec3f _vf_Pos, float _speed);
     void setPos(ofVec3f _vf_Pos, ofVec3f _vf_Rotate);
+    ofVec3f getPos();
     void noGravity();
     void setGoalLoop();
     void setGravity(float _gravity);

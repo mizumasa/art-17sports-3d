@@ -28,6 +28,12 @@ void ofApp::setup(){
 
     ofSetSmoothLighting(true);
 
+    ballLight.setup();
+    ballLight.setAmbientColor(ofFloatColor(0.1,0.1,1.0,1.0));
+    ballLight.setDiffuseColor(ofFloatColor(0.4,0.4,1.0));
+    ballLight.setSpecularColor(ofFloatColor(0.0f, 0.0f, 1.0f));
+    ballLight.setPosition(RADIUS/sqrt(2.0), -RADIUS/sqrt(2.0),0);
+
     testLight.setup();
     testLight.disable();
     testLight.setPointLight();
@@ -37,8 +43,8 @@ void ofApp::setup(){
     ///testLight.setAmbientColor(ofFloatColor(1.0,0.2,0.2));
     //testLight.setAttenuation(1.0,1.0,1.0);
     //testLight.setDiffuseColor(ofFloatColor(0.5,0.5,0.5));
-    testLight.setAmbientColor(ofFloatColor(0.1,0.1,0.1,1.0));
-    testLight.setDiffuseColor(ofFloatColor(0.4,0.4,0.4));
+    testLight.setAmbientColor(ofFloatColor(1.0,1.0,1.0,1.0));
+    testLight.setDiffuseColor(ofFloatColor(1.0,1.0,1.0));
     testLight.setSpecularColor(ofFloatColor(1.0f, 1.0f, 1.0f));
     testLight.setPosition(RADIUS/sqrt(2.0), -RADIUS/sqrt(2.0),0);
     //testLight.lookAt(ofVec3f(0,0,0));
@@ -75,7 +81,6 @@ void ofApp::setup(){
     materialPlaneBlack.setDiffuseColor(ofFloatColor(0.0,0.0,0.0,0.0));
     materialPlaneBlack.setSpecularColor(ofFloatColor(0,0,0,0));
     materialPlaneBlack.setShininess(0);
-    
     
     {
         ofxObjectCamera camBuf;
@@ -117,7 +122,14 @@ void ofApp::setup(){
         camBuf.setAutoMove();
         v_Camera.push_back(camBuf);
     }
-
+    {
+        ofxObjectCamera camBuf;
+        camBuf.setFarClip(20000);
+        camBuf.setPosition(0, -RADIUS,0);
+        camBuf.lookAt(ofVec3f(0,RADIUS,0), ofVec3f(0,0,1));
+        camBuf.setFov(50);
+        v_Camera.push_back(camBuf);
+    }
     
     for(int i = -MIR_X_NUM ;i<=MIR_X_NUM ;i++){
         for(int j = 0 ;j<=MIR_Y_NUM ;j++){
@@ -201,9 +213,20 @@ void ofApp::setup(){
     modelGoalBall.noGravity();
     modelGoalBall.setGoalLoop();
     receiver.setup(PORT);
+    
+    ballParticle.setup();
+    
+    
+    //Gritch
+    lenna.loadImage("lenna.png");
+    bDrawLenna = false;
+    bShowHelp  = true;
+    myFbo.allocate(512, 512);
+    myGlitch.setup(&myFbo);
+    
 }
 
-//--------------------------------------------------------------
+//update--------------------------------------------------------------
 void ofApp::update(){
 	//areaLight.setPosition(0,-200,0);
     for(int i = 0; i<v_ObjectMirror.size(); i++){
@@ -217,6 +240,12 @@ void ofApp::update(){
     }
     for(int i = 0; i<v_Camera.size(); i++){
         v_Camera[i].update();
+        if(i==4){
+            ofVec3f ballPos;
+            ballPos = modelBall.getPos();
+            v_Camera[i].setPosition(ballPos+ofVec3f(0, -100,100));
+            v_Camera[i].lookAt(ballPos+ofVec3f(0, 0,0), ofVec3f(0,0,1));
+        }
     }
     if(b_UpdateFbo){
         b_UpdateFbo = false;
@@ -235,8 +264,19 @@ void ofApp::update(){
     
     
     modelBall.update();
+    if(b_BallColor){
+        ballLight.setAmbientColor(ofFloatColor(0.1,sin(ofGetElapsedTimeMillis()/100.0)/2+0.5,cos(ofGetElapsedTimeMillis()/100.0)/2+0.5,1.0));
+        ballLight.setDiffuseColor(ofFloatColor(0.1,sin(ofGetElapsedTimeMillis()/100.0)/2+0.5,cos(ofGetElapsedTimeMillis()/100.0)/2+0.5,1.0));
+        ballLight.setSpecularColor(ofFloatColor(0.0f,sin(ofGetElapsedTimeMillis()/100.0)/2+0.5,cos(ofGetElapsedTimeMillis()/100.0)/2+0.5));
+    }else{
+        ballLight.setAmbientColor(ofFloatColor(0.1,0.1,1.0,1.0));
+        ballLight.setDiffuseColor(ofFloatColor(0.4,0.4,1.0));
+        ballLight.setSpecularColor(ofFloatColor(0.0f, 0.0f, 1.0f));
+    }
     modelGoalBall.update();
     objectEffect.update();
+
+    ballParticle.update();
 
     if(USE_BLACKMAGIC){
         if(cam.update()){
@@ -262,6 +302,16 @@ void ofApp::update(){
             recY = m.getArgAsInt32(1);
             cout << recX << ":"<< recY << endl;
         }
+        if(m.getAddress() == "/start"){
+            int recX;
+            recX = m.getArgAsInt32(0);
+            cout << "OSC start" << recX << endl;
+        }
+        if(m.getAddress() == "/update"){
+            int recX;
+            recX = m.getArgAsInt32(0);
+            cout << m.getAddress() << recX << endl;
+        }
     }
     
 }
@@ -286,6 +336,14 @@ void ofApp::draw(){
 
 //--------------------------------------------------------------
 void ofApp::drawInput(){
+    /*if(b_TitleShakeManual){
+        myFbo.begin();
+    }*/
+    ofDisableLighting();
+    ofDisableDepthTest();
+
+    ofSetColor(255,255,255);
+
     ofBackground(0,0,0);
     if(b_CamStart){
         ofPushStyle();
@@ -293,9 +351,64 @@ void ofApp::drawInput(){
         int drawHeight;
         drawHeight = int(ofGetWidth()*camImg.getHeight()/camImg.getWidth());
         camImg.draw(0,int((ofGetHeight()-drawHeight)/2),-2, ofGetWidth(), drawHeight);
-        ofPushMatrix();
-        ofPushStyle();
+        ofPopMatrix();
+        ofPopStyle();
     }
+    
+    myFbo.begin();
+    ofClear(0, 0, 0,255);
+    if (!bDrawLenna){
+        for (int i = 0;i < 100;i++){
+            if        (i % 5 == 0)ofSetColor(50 , 255, 100);
+            else if (i % 9 == 0)ofSetColor(255, 50, 100);
+            else                ofSetColor(255, 255, 255);
+            
+            ofPushMatrix();
+            ofRotate(ofGetFrameNum(), 1.0, 1.0, 1.0);
+            ofTranslate((ofNoise(i/2.4)-0.5)*1000,
+                        (ofNoise(i/5.6)-0.5)*1000,
+                        (ofNoise(i/8.2)-0.5)*1000);
+            ofCircle(0, 0, (ofNoise(i/3.4)-0.5)*100+ofRandom(3));
+            ofPopMatrix();
+        }
+    }else{
+        ofSetColor(255);
+        int drawHeight;
+        drawHeight = int(ofGetWidth()*camImg.getHeight()/camImg.getWidth());
+        camImg.draw(0,int((ofGetHeight()-drawHeight)/2),-2, ofGetWidth(), drawHeight);
+    }
+    myFbo.end();
+
+    ofSetColor(255);
+    myFbo.draw(0, 0);
+    
+    /* Apply effects */
+    myGlitch.generateFx();
+    
+    /* draw effected view */
+    ofSetColor(255);
+    myFbo.draw(512, 0);
+    
+    
+    /* show information*/
+    string info = "";
+    info += "1 - 0 : Apply glitch effects.\n";
+    info += "q - u : Apply color remap effects.\n";
+    info += "L key : Switch 3Dview / 2DImage.\n";
+    info += "H key : Hide or show this information.";
+    
+    if (bShowHelp){
+        ofSetColor(0, 200);
+        ofRect(25, 17, 320, 60);
+        ofSetColor(255);
+        ofDrawBitmapString(info, 30,30);
+    }
+
+    /*if(b_TitleShakeManual){
+        myFbo.end();
+        myGlitch.generateFx();
+        myFbo.draw(0, 0);
+    }*/
 }
 
 //--------------------------------------------------------------
@@ -358,12 +471,22 @@ void ofApp::draw3D(){
         }
         {
             ofPushMatrix();
+            
+            
+            testLight.disable();
+            areaLight.disable();
+            ballLight.enable();
             if(i_Camera==2){
                 //ofTranslate(0,pf_Buf6 * (pf_Buf3+pf_Buf4),pf_Buf6*pf_Buf5);
                 modelGoalBall.draw();
             }else{
                 modelBall.draw();
             }
+            ballLight.disable();
+
+            if(b_TestLight)testLight.enable();
+            if(!b_TestLight)areaLight.enable();
+            
             ofPopMatrix();
         }
         {
@@ -386,6 +509,16 @@ void ofApp::draw3D(){
     }else{
         materialPlaneBlack.end();
     }
+    
+    ofPushStyle();
+    ofPushMatrix();
+    ofTranslate(-ofGetWidth()/2, -ofGetHeight()/2,100);
+    ofDisableDepthTest();
+    ballParticle.draw();
+    ofPopMatrix();
+    ofPopStyle();
+    
+
     
     for(int i = 0; i<v_ObjectLight.size(); i++){
         v_ObjectLight[i].draw();
@@ -520,13 +653,13 @@ void ofApp::keyPressed(int key){
         case '2':
             i_SceneID = 2;
             break;
-        case '3':
+        /*case '3':
             i_SceneID = 3;
             break;
         case '4':
             i_SceneID = 4;
             break;
-
+         */
         case '0':
             i_test += 1;
             break;
@@ -544,11 +677,54 @@ void ofApp::keyPressed(int key){
                 }
             }
             break;
+        case 'b':
+            b_BallColor = !b_BallColor;
+            break;
 	}
+    if (key == '1') myGlitch.setFx(OFXPOSTGLITCH_CONVERGENCE    , true);
+    if (key == '2') myGlitch.setFx(OFXPOSTGLITCH_GLOW            , true);
+    if (key == '3') myGlitch.setFx(OFXPOSTGLITCH_SHAKER            , true);
+    if (key == '4') myGlitch.setFx(OFXPOSTGLITCH_CUTSLIDER        , true);
+    if (key == '5') myGlitch.setFx(OFXPOSTGLITCH_TWIST            , true);
+    if (key == '6') myGlitch.setFx(OFXPOSTGLITCH_OUTLINE        , true);
+    if (key == '7') myGlitch.setFx(OFXPOSTGLITCH_NOISE            , true);
+    if (key == '8') myGlitch.setFx(OFXPOSTGLITCH_SLITSCAN        , true);
+    if (key == '9') myGlitch.setFx(OFXPOSTGLITCH_SWELL            , true);
+    if (key == '0') myGlitch.setFx(OFXPOSTGLITCH_INVERT            , true);
+    
+    if (key == 'q') myGlitch.setFx(OFXPOSTGLITCH_CR_HIGHCONTRAST, true);
+    if (key == 'w') myGlitch.setFx(OFXPOSTGLITCH_CR_BLUERAISE    , true);
+    if (key == 'e') myGlitch.setFx(OFXPOSTGLITCH_CR_REDRAISE    , true);
+    if (key == 'r') myGlitch.setFx(OFXPOSTGLITCH_CR_GREENRAISE    , true);
+    if (key == 't') myGlitch.setFx(OFXPOSTGLITCH_CR_BLUEINVERT    , true);
+    if (key == 'y') myGlitch.setFx(OFXPOSTGLITCH_CR_REDINVERT    , true);
+    if (key == 'u') myGlitch.setFx(OFXPOSTGLITCH_CR_GREENINVERT    , true);
+    
+    if (key == 'l') bDrawLenna ^= true;
+    if (key == 'h') bShowHelp ^= true;
+
 }
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
+    if (key == '1') myGlitch.setFx(OFXPOSTGLITCH_CONVERGENCE    , false);
+    if (key == '2') myGlitch.setFx(OFXPOSTGLITCH_GLOW            , false);
+    if (key == '3') myGlitch.setFx(OFXPOSTGLITCH_SHAKER            , false);
+    if (key == '4') myGlitch.setFx(OFXPOSTGLITCH_CUTSLIDER        , false);
+    if (key == '5') myGlitch.setFx(OFXPOSTGLITCH_TWIST            , false);
+    if (key == '6') myGlitch.setFx(OFXPOSTGLITCH_OUTLINE        , false);
+    if (key == '7') myGlitch.setFx(OFXPOSTGLITCH_NOISE            , false);
+    if (key == '8') myGlitch.setFx(OFXPOSTGLITCH_SLITSCAN        , false);
+    if (key == '9') myGlitch.setFx(OFXPOSTGLITCH_SWELL            , false);
+    if (key == '0') myGlitch.setFx(OFXPOSTGLITCH_INVERT            , false);
+    
+    if (key == 'q') myGlitch.setFx(OFXPOSTGLITCH_CR_HIGHCONTRAST, false);
+    if (key == 'w') myGlitch.setFx(OFXPOSTGLITCH_CR_BLUERAISE    , false);
+    if (key == 'e') myGlitch.setFx(OFXPOSTGLITCH_CR_REDRAISE    , false);
+    if (key == 'r') myGlitch.setFx(OFXPOSTGLITCH_CR_GREENRAISE    , false);
+    if (key == 't') myGlitch.setFx(OFXPOSTGLITCH_CR_BLUEINVERT    , false);
+    if (key == 'y') myGlitch.setFx(OFXPOSTGLITCH_CR_REDINVERT    , false);
+    if (key == 'u') myGlitch.setFx(OFXPOSTGLITCH_CR_GREENINVERT    , false);
 
 }
 

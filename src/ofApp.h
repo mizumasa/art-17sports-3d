@@ -12,11 +12,14 @@
 #include "ofxBlackMagic.h"
 #include "common.h"
 #include "ofxOsc.h"
+#include "ofxOscBone.h"
+#include "ofxPostGlitch.h"
 
 #include "ofxTimeLine.h"
 
 #include "ofxFboBlur.h"
 #include "ofxAssimpModelLoader.h"
+#include "ofxObjectParticle.h"
 
 #define USE_BLACKMAGIC 0
 #define BLACKMAGIC_W 1920
@@ -96,11 +99,12 @@ public:
     ofLight testLight;
     
     ofLight areaLight;
+    ofLight ballLight;
     ofPlanePrimitive plane;
     
     ofMaterial materialPlane;
     ofMaterial materialPlaneBlack;
-    
+
     int i_test;
     
     vector<ofxObjectMirror> v_ObjectMirror;
@@ -128,6 +132,8 @@ public:
     ofImage imgCourt;
     ofxObjectGoal modelGoal;
     ofxObjectBall modelBall;
+    bool b_BallColor;
+    ofxObjectParticle ballParticle;
     ofxObjectBall modelGoalBall;//goal boal
 
     ofxObjectEffects objectEffect;
@@ -143,5 +149,13 @@ public:
     bool b_CamStart;
 
     ofxOscReceiver receiver;
+    
+    
+    ofImage            lenna;
+    bool            bDrawLenna;
+    bool            bShowHelp;
+    
+    ofFbo            myFbo;
+    ofxPostGlitch    myGlitch;
 };
 

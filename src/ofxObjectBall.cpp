@@ -7,7 +7,7 @@ ofxObjectBall::ofxObjectBall(){
     vf_Speed = ofVec3f(0, 0, 0);
     vf_RotateSpeed = ofVec3f(2, 14, 0);
     vf_Rotate = ofVec3f(0, 0, 0);
-    vf_Gravity = ofVec3f(0, 0, -0.1);
+    vf_Gravity = ofVec3f(0, 0, -0.2);
     b_GoalLoop = false;
     t_Count = 0;
 }
@@ -20,10 +20,17 @@ void ofxObjectBall::update(){
     vf_Rotate += vf_RotateSpeed;
     vf_Pos += vf_Speed;
     if(vf_Pos[2]<GROUND_LEVEL){
-        vf_Pos[2] = GROUND_LEVEL;
+        vf_Pos[2]=GROUND_LEVEL;
+        vf_Speed[2] = -vf_Speed[2]*2/3;
+        //vf_Pos[2] = GROUND_LEVEL;
+        vf_Speed[0] = vf_Speed[0]/2;
+        vf_Speed[1] = vf_Speed[1]/2;
     }
     if(vf_Pos[1]>COURT_HEIGHT_HALF){
-        vf_Speed[1] = -vf_Speed[1];
+        vf_Pos[1]=COURT_HEIGHT_HALF;
+        vf_Speed[1] = -vf_Speed[1]*2/3;
+        vf_Speed[0] = vf_Speed[0]/2;
+        vf_Speed[2] = vf_Speed[2]/2;
     }
     if(b_GoalLoop){
         vf_Pos = ofVec3f(16.9*sin(t_Count/10.0),104.4+16.9*cos(t_Count/10.0),130.11);
@@ -47,6 +54,11 @@ void ofxObjectBall::setPos(ofVec3f _vf_Pos, ofVec3f _vf_Rotate){
     vf_Pos = _vf_Pos;
     vf_Rotate = _vf_Rotate;
 }
+
+ofVec3f ofxObjectBall::getPos(){
+    return vf_Pos;
+}
+
 void ofxObjectBall::noGravity(){
     vf_Gravity = ofVec3f(0,0,0);
 }
