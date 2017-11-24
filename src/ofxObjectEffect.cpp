@@ -58,7 +58,7 @@ bool ofxObjectEffect::isEnd(){
 void ofxObjectEffect::draw(){
     ofPushMatrix();
     ofPushStyle();
-    ofSetColor(255, 255, 255);
+    ofSetColor(255, 255, 255,128);
     ofTranslate(vf_Pos);
     ofNoFill();
     ofDrawCircle(0,0,0,i_Count);

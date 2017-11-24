@@ -3,6 +3,7 @@
 //--------------------------------------------------------------
 ofxObjectCamera::ofxObjectCamera(){
     b_AutoMove=false;
+    b_ChaseBall=false;
     i_Mode = 0;
     i_AutoCount = 0;
     f_PosPan = 0;
@@ -14,6 +15,15 @@ ofxObjectCamera::ofxObjectCamera(){
 void ofxObjectCamera::setAutoMove(){
     b_AutoMove=true;
     changeMode();
+}
+
+//--------------------------------------------------------------
+void ofxObjectCamera::setChaseBall(){
+    b_ChaseBall=true;
+}
+//--------------------------------------------------------------
+bool ofxObjectCamera::getChaseBall(){
+    return b_ChaseBall;
 }
 
 //--------------------------------------------------------------
@@ -29,12 +39,12 @@ void ofxObjectCamera::changeMode(){
     }
     switch (i_Mode) {
         case 0:
-            setPos(ofRandom(120, 180), 20, distanceBuf);
-            lookAt(ofVec3f(0,MOVE_RADIUS_MAX,0), ofVec3f(0,0,1));
+            setPos(ofRandom(120, 180), 10, distanceBuf);
+            lookAt(ofVec3f(0,MOVE_RADIUS_MAX,-100), ofVec3f(0,0,1));
             break;
         case 1:
-            setPos(ofRandom(-120, -180), 20, distanceBuf);
-            lookAt(ofVec3f(0,MOVE_RADIUS_MAX,0), ofVec3f(0,0,1));
+            setPos(ofRandom(-120, -180), 10, distanceBuf);
+            lookAt(ofVec3f(0,MOVE_RADIUS_MAX,-100), ofVec3f(0,0,1));
             break;
         default:
             break;

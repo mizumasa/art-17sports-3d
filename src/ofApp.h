@@ -21,7 +21,7 @@
 #include "ofxAssimpModelLoader.h"
 #include "ofxObjectParticle.h"
 
-#define USE_BLACKMAGIC 1
+#define USE_BLACKMAGIC 0
 //#define BLACKMAGIC_W 1920
 //#define BLACKMAGIC_H 1080
 //#define BLACKMAGIC_FPS 30
@@ -90,6 +90,8 @@ public:
     void drawInput();
     void draw3D();
     void exit();
+    void changeToField();
+    void changeToGoal();
     void keyPressed(int key);
     void keyReleased(int key);
     void mouseMoved(int x, int y );
@@ -189,5 +191,6 @@ public:
     ofImage i_BigSightMask;
     ofImage i_BigSightMask2;
     int i_BigSightMaskMode;
+    ofSoundPlayer bgm;
 };
 

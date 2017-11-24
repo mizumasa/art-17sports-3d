@@ -12,6 +12,7 @@ public:
 	void setup();
 	void update();
     void addMouse();
+    void addPoint(ofVec3f _pos);
     void addPoint(int x,int y);
 	void draw();
 };

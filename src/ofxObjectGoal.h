@@ -7,6 +7,7 @@
 #define __ofxObjectGoal__
 
 #include "ofMain.h"
+#include "common.h"
 #include "ofxAssimpModelLoader.h"
 
 class ofxObjectGoal{

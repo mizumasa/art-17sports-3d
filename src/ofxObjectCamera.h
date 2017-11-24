@@ -18,12 +18,15 @@ class ofxObjectCamera :public ofEasyCam{
 public:
     ofxObjectCamera();
     void setAutoMove();
+    void setChaseBall();
+    bool getChaseBall();
     void changeMode();
     void update();
     void setPos(float _f_Pan,float _f_Tilt,float _f_Distance);
     ofVec3f getPos();
 private:
     bool b_AutoMove;
+    bool b_ChaseBall;
     int i_AutoCount;
     
     int i_Mode;

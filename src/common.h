@@ -9,6 +9,9 @@
 #define COURT_WIDTH_HALF 86
 #define COURT_HEIGHT_HALF 142
 #define GOAL_HEIGHT 130
+//#define GOAL_Y_OFFSET 20
+#define GOAL_Y_OFFSET 10
+
 #define PORT 12345
 
 #define OPENPOSE_RESIZE_RATE 0.1

@@ -16,6 +16,7 @@
  */
 //--------------------------------------------------------------
 void ofApp::setup(){
+    ofSetFrameRate(30);
     if(XML.load("settings.xml") ){cout << "setting loaded" <<endl;
     }else{cout << "setting load error" <<endl;}
     if(SCHEDULE.load("schedule.xml") ){cout << "setting loaded" <<endl;
@@ -34,6 +35,9 @@ void ofApp::setup(){
             setupRight();
             break;
     }
+    
+    bgm.load("bgm.mp3");
+    bgm.setVolume(1.0);
     
     i_NowScheduleId = 0;
     b_ScheduleStart = false;
@@ -67,8 +71,8 @@ void ofApp::setup(){
     ///testLight.setAmbientColor(ofFloatColor(1.0,0.2,0.2));
     //testLight.setAttenuation(1.0,1.0,1.0);
     //testLight.setDiffuseColor(ofFloatColor(0.5,0.5,0.5));
-    testLight.setAmbientColor(ofFloatColor(1.0,1.0,1.0,1.0));
-    testLight.setDiffuseColor(ofFloatColor(1.0,1.0,1.0));
+    testLight.setAmbientColor(ofFloatColor(0.8,0.8,0.8,1.0));
+    testLight.setDiffuseColor(ofFloatColor(0.8,0.8,0.8));
     testLight.setSpecularColor(ofFloatColor(1.0f, 1.0f, 1.0f));
     testLight.setPosition(RADIUS/sqrt(2.0), -RADIUS/sqrt(2.0),0);
     //testLight.lookAt(ofVec3f(0,0,0));
@@ -105,37 +109,35 @@ void ofApp::setup(){
     {
         ofxObjectCamera camBuf;
         camBuf.setFarClip(20000);
-        camBuf.setPosition(0, 0,0);
-        camBuf.setDistance(1.0);
-        camBuf.move(-200, -300, 0);
-        camBuf.lookAt(ofVec3f(0,RADIUS,0), ofVec3f(0,0,1));
+        camBuf.setPosition(50, -50,70);
+        camBuf.lookAt(ofVec3f(0,0,-200), ofVec3f(0,0,1));
+        camBuf.setDistance(300.0);
         camBuf.setFov(70);
         v_Camera.push_back(camBuf);
     }
     {
         ofxObjectCamera camBuf;
         camBuf.setFarClip(20000);
-        camBuf.setPosition(RADIUS/sqrt(2.0), -RADIUS/sqrt(2.0),0);
-        camBuf.lookAt(ofVec3f(0,RADIUS,0), ofVec3f(0,0,1));
+        camBuf.setPosition(0, -RADIUS/sqrt(2.0),0);
+        camBuf.lookAt(ofVec3f(0,RADIUS,300), ofVec3f(0,0,1));
+        camBuf.setDistance(150.0);
         camBuf.setFov(50);
         v_Camera.push_back(camBuf);
     }
     {
         ofxObjectCamera camBuf;
-        //camBuf.enableOrtho();
-        camBuf.setPosition(0,0,GOAL_HEIGHT);
-        camBuf.setDistance(GOAL_HEIGHT);
-        camBuf.lookAt(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT), ofVec3f(0,0,1));
-        camBuf.setFov(50);
-        //camBuf.setNearClip(0);
         camBuf.setFarClip(20000);
+        camBuf.setPosition(0, -RADIUS*4,RADIUS);
+        camBuf.lookAt(ofVec3f(0,-RADIUS*3,GROUND_LEVEL), ofVec3f(0,0,1));
+        camBuf.setDistance(250.0);
+        camBuf.setFov(80);
         v_Camera.push_back(camBuf);
     }
     {
         ofxObjectCamera camBuf;
         //camBuf.enableOrtho();
         camBuf.setPosition(RADIUS/sqrt(2.0), -RADIUS/sqrt(2.0),0);
-        camBuf.lookAt(ofVec3f(0,RADIUS,0), ofVec3f(0,0,1));
+        camBuf.lookAt(ofVec3f(0,RADIUS,GROUND_LEVEL), ofVec3f(0,0,1));
         camBuf.setFov(50);
         //camBuf.setNearClip(0);
         camBuf.setFarClip(20000);
@@ -146,10 +148,23 @@ void ofApp::setup(){
         ofxObjectCamera camBuf;
         camBuf.setFarClip(20000);
         camBuf.setPosition(0, -RADIUS,0);
-        camBuf.lookAt(ofVec3f(0,RADIUS,0), ofVec3f(0,0,1));
+        camBuf.lookAt(ofVec3f(0,RADIUS,GROUND_LEVEL), ofVec3f(0,0,1));
+        camBuf.setChaseBall();
         camBuf.setFov(50);
         v_Camera.push_back(camBuf);
     }
+    {
+        ofxObjectCamera camBuf;
+        //camBuf.enableOrtho();
+        camBuf.setPosition(0,COURT_HEIGHT_HALF*7.8/8,GOAL_HEIGHT);
+        camBuf.setDistance(150);
+        camBuf.lookAt(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT), ofVec3f(0,0,1));
+        camBuf.setFov(30);
+        //camBuf.setNearClip(0);
+        camBuf.setFarClip(20000);
+        v_Camera.push_back(camBuf);
+    }
+
     
     for(int i = -MIR_X_NUM ;i<=MIR_X_NUM ;i++){
         for(int j = 0 ;j<=MIR_Y_NUM ;j++){
@@ -198,6 +213,7 @@ void ofApp::setup(){
     gui.add(pf_Buf4.setup("pf_Buf4", 1, 1, 100.0));
     gui.add(pf_Buf5.setup("pf_Buf5", 1, 1, 100.0));
     gui.add(pf_Buf6.setup("pf_Buf6", 1, 0.01, 10.0));
+    gui.setPosition(0,ofGetHeight()/2);
     b_GuiDraw = false;
     
     gpuBlur.blurOffset = 24;
@@ -275,9 +291,25 @@ void ofApp::update(){
 
     if(b_ScheduleStart){
         b_ScheduleStart = false;
-        v_ScheduleSeg[i_NowScheduleId].video.play();
-        b_SchedulePlaying = true;
-        i_SceneID = 3;
+        b_SchedulePlaying = false;
+        if(i_NowScheduleId==0){
+            bgm.play();
+        }
+        switch(v_ScheduleSeg[i_NowScheduleId].actMode){
+            case ACT_MODE_CG:
+                i_SceneID = 1;
+                break;
+            case ACT_MODE_CAPTURE:
+                i_SceneID = 2;
+                break;
+            case ACT_MODE_MOVIE:
+                v_ScheduleSeg[i_NowScheduleId].video.play();
+                b_SchedulePlaying = true;
+                i_SceneID = 3;
+                break;
+            default:
+                break;
+        }
     }
     if(b_SchedulePlaying){
         v_ScheduleSeg[i_NowScheduleId].video.update();
@@ -286,18 +318,28 @@ void ofApp::update(){
     while(receiver.hasWaitingMessages()){
         ofxOscMessage m;
         receiver.getNextMessage(&m);
-        if(m.getAddress() == "/mouse/position"){
+        if((i_SceneID == 1) and m.getAddress() == "/mouse/position"){
             int recX,recY,recScore;
             recX = int((unsigned char)(m.getArgAsChar(0)));
             recY = int((unsigned char)(m.getArgAsChar(1)));
             recScore = int((unsigned char)(m.getArgAsChar(2)));
             cout << recX << ":"<< recY << "=" << recScore << endl;
+            if(recScore>50){
+                int addPosX,addPosY;
+                addPosX = 2 * COURT_WIDTH_HALF * (0.5 - recX / 255.0);
+                addPosY = 2 * COURT_HEIGHT_HALF * (recY / 255.0 - 0.5);
+                objectEffect.add(ofVec3f(addPosX,addPosY,GROUND_LEVEL+4));
+            }
         }
-        if(m.getAddress() == "/debug/position"){
+        if((i_SceneID == 1) and m.getAddress() == "/debug/position"){
             int recX,recY;
             recX = int((unsigned char)(m.getArgAsChar(0)));
             recY = int((unsigned char)(m.getArgAsChar(1)));
             cout << "Debug Pos "<< recX << ":"<< recY << endl;
+            int addPosX,addPosY;
+            addPosX = 2 * COURT_WIDTH_HALF * (0.5 - recX / 255.0);
+            addPosY = 2 * COURT_HEIGHT_HALF * (recY / 255.0 - 0.5);
+            objectEffect.add(ofVec3f(addPosX,addPosY,GROUND_LEVEL+4));
         }
         if(m.getAddress() == "/pose/start"){
             int recX;
@@ -349,7 +391,7 @@ void ofApp::update3D(){
     }
     for(int i = 0; i<v_Camera.size(); i++){
         v_Camera[i].update();
-        if(i==4){
+        if(v_Camera[i].getChaseBall()){
             ofVec3f ballPos;
             ballPos = modelBall.getPos();
             v_Camera[i].setPosition(ballPos+ofVec3f(0, -100,100));
@@ -358,7 +400,7 @@ void ofApp::update3D(){
     }
     
     modelBall.update();
-    if(b_BallColor){
+    if(b_BallColor and !modelBall.isReversePlaying() and !modelGoalBall.isReversePlaying()){
         ballLight.setAmbientColor(ofFloatColor(0.1,sin(ofGetElapsedTimeMillis()/100.0)/2+0.5,cos(ofGetElapsedTimeMillis()/100.0)/2+0.5,1.0));
         ballLight.setDiffuseColor(ofFloatColor(0.1,sin(ofGetElapsedTimeMillis()/100.0)/2+0.5,cos(ofGetElapsedTimeMillis()/100.0)/2+0.5,1.0));
         ballLight.setSpecularColor(ofFloatColor(0.0f,sin(ofGetElapsedTimeMillis()/100.0)/2+0.5,cos(ofGetElapsedTimeMillis()/100.0)/2+0.5));
@@ -369,9 +411,11 @@ void ofApp::update3D(){
     }
     modelGoalBall.update();
     objectEffect.update();
-    ballParticle.addMouse();
+    //ballParticle.addMouse();
+    if(b_BallColor and !modelBall.isReversePlaying() and !modelGoalBall.isReversePlaying()){
+        ballParticle.addPoint(modelBall.getPos());
+    }
     ballParticle.update();
-
 }
 
 
@@ -410,7 +454,6 @@ void ofApp::draw(){
         ofDisableLighting();
         ofDisableDepthTest();
         ofSetColor(255, 255, 255,255);
-        ofTranslate(0,ofGetHeight()/2);
         gui.draw();
         ofPopStyle();
         ofSetColor(255, 255, 255,255);
@@ -421,7 +464,7 @@ void ofApp::draw(){
         info += ofToString(v_ScheduleSeg[i_NowScheduleId].s_Name)+"\n";
         info += " ";
         ofSetColor(255,255,255);
-        ofDrawBitmapString(info, 20,gui.getHeight()+50);
+        ofDrawBitmapString(info, 20,gui.getPosition().y + gui.getHeight()+50);
     }
 }
 
@@ -557,6 +600,7 @@ void ofApp::draw3D(){
         }
         {
             ofPushMatrix();
+            //ofTranslate(0,pf_Buf3*pf_Buf2 ,pf_Buf5*pf_Buf6);
             modelGoal.draw();
             ofPopMatrix();
         }
@@ -567,7 +611,7 @@ void ofApp::draw3D(){
             testLight.disable();
             areaLight.disable();
             ballLight.enable();
-            if(i_Camera==2){
+            if(i_Camera==(v_Camera.size()-1)){
                 //ofTranslate(0,pf_Buf6 * (pf_Buf3+pf_Buf4),pf_Buf6*pf_Buf5);
                 modelGoalBall.draw();
             }else{
@@ -580,13 +624,15 @@ void ofApp::draw3D(){
             
             ofPopMatrix();
         }
+        objectEffect.draw();
         {
             ofPushMatrix();
             ofTranslate(0, 0,GROUND_LEVEL);
-            camImg.draw(-COURT_WIDTH_HALF, -COURT_HEIGHT_HALF, COURT_WIDTH_HALF*2, 2*COURT_HEIGHT_HALF);
-            ofSetColor(128, 128, 128, 128);
-            ofTranslate(0, 0, 1);
+            ofRotateZ(180);
             imgCourt.draw(-COURT_WIDTH_HALF, -COURT_HEIGHT_HALF, COURT_WIDTH_HALF*2, 2*COURT_HEIGHT_HALF);
+            ofSetColor(255, 255, 255, 200);
+            ofTranslate(0, 0, 1);
+            camImg.draw(-COURT_WIDTH_HALF, -COURT_HEIGHT_HALF, COURT_WIDTH_HALF*2, 2*COURT_HEIGHT_HALF);
             ofPopMatrix();
         }
     }
@@ -603,7 +649,6 @@ void ofApp::draw3D(){
     
     ofPushStyle();
     ofPushMatrix();
-    ofTranslate(-ofGetWidth()/2, -ofGetHeight()/2,100);
     ofDisableDepthTest();
     ballParticle.draw();
     ofPopMatrix();
@@ -635,6 +680,7 @@ void ofApp::draw3D(){
         ofPopStyle();
     }
 #endif
+    
 
     
     v_Camera[i_Camera].end();
@@ -669,7 +715,6 @@ void ofApp::draw3D(){
         ofPopMatrix();
     }
     
-    objectEffect.draw();
     v_Camera[i_Camera].end();
     
     gpuBlur.endDrawScene();
@@ -682,6 +727,19 @@ void ofApp::draw3D(){
 
 }
 
+void ofApp::changeToField(){
+    i_Camera = 0;
+    modelBall.clearHistory();
+}
+void ofApp::changeToGoal(){
+    i_Camera = v_Camera.size()-1;
+    modelGoalBall.t_Count = 0;
+    modelGoalBall.noGravity();
+    modelGoalBall.setGoalLoop();
+    modelGoalBall.clearHistory();
+}
+
+
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
 	switch(key){
@@ -691,6 +749,30 @@ void ofApp::keyPressed(int key){
             break;
         case 'e':
             objectEffect.add(ofVec3f(ofRandom(-80,80),ofRandom(-120,100),GROUND_LEVEL));
+            break;
+        case 'p':
+            if(i_Camera == (v_Camera.size()-1)){
+                modelGoalBall.togglePose();
+            }else{
+                modelBall.togglePose();
+            }
+            break;
+        case ';':
+            if(i_Camera == (v_Camera.size()-1)){
+                modelGoalBall.startReplay();
+            }else{
+                modelBall.startReplay();
+            }
+            break;
+        case '/':
+            if(i_Camera == (v_Camera.size()-1)){
+                modelGoalBall.startReverse();
+            }else{
+                modelBall.startReverse();
+            }
+            break;
+        case 's':
+            bgm.stop();
             break;
         case 't':
             b_TestLight = !b_TestLight;
@@ -707,7 +789,17 @@ void ofApp::keyPressed(int key){
             break;
         case 'j':
             //modelBall.setSpeed(ofVec3f(0,0,5));
-            modelBall.throwTo(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT),20);
+            modelBall.throwTo(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT+40),13);
+            break;
+        case '[':
+            modelBall.clearHistory();
+            modelBall.setPos(ofVec3f(0,-COURT_HEIGHT_HALF,GROUND_LEVEL),ofVec3f(0,0,0));
+            modelBall.throwTo(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT+100),10);
+            break;
+        case ']':
+            modelBall.clearHistory();
+            modelBall.setPos(ofVec3f(0,-COURT_HEIGHT_HALF,GROUND_LEVEL),ofVec3f(0,0,0));
+            modelBall.throwTo(ofVec3f(-GOAL_LOOP_RADIUS,COURT_HEIGHT_HALF,GOAL_HEIGHT+300),13);
             break;
         case OF_KEY_UP:
             i_NowScheduleId = MAX(0,i_NowScheduleId-1);
@@ -741,12 +833,26 @@ void ofApp::keyPressed(int key){
         case '9':
             i_test -= 1;
             break;
+        case 'x':
+            if(i_Camera == (v_Camera.size()-1)){
+                changeToField();
+            }else{
+                changeToGoal();
+            }
+            for(int i = 0;i<v_Camera.size();i++){
+                if(i_Camera == i){
+                    v_Camera[i].enableMouseInput();
+                }else{
+                    v_Camera[i].disableMouseInput();
+                }
+            }
+            break;
         case 'm':
             i_BigSightMaskMode = (i_BigSightMaskMode+1)%3;
             break;
         case 'c':
             //b_Camera = !b_Camera;
-            i_Camera = (i_Camera +1)%v_Camera.size();
+            i_Camera = (i_Camera +1)%(v_Camera.size()-1);
             for(int i = 0;i<v_Camera.size();i++){
                 if(i_Camera == i){
                     v_Camera[i].enableMouseInput();
@@ -758,7 +864,15 @@ void ofApp::keyPressed(int key){
         case 'b':
             b_BallColor = !b_BallColor;
             break;
-
+        case '@':
+            modelGoalBall.releaseOut();
+            break;
+        case ':':
+            modelGoalBall.releaseGoal();
+            break;
+        case '_':
+            modelGoalBall.startGoalLoopSlow();
+            break;
 	}
     if (key == '-') myGlitch.setFx(OFXPOSTGLITCH_CONVERGENCE    , true);
     if (key == '2') myGlitch.setFx(OFXPOSTGLITCH_GLOW            , true);

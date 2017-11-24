@@ -23,18 +23,20 @@ void ofxObjectParticle::setup()
 	group.setColor(ofxSPK::RangeC(ofColor(255, 255), ofColor(255, 255)),
 				   ofxSPK::RangeC(ofColor(0, 0), ofColor(255, 0)));
 	
-	group.setLifeTime(0.5, 5);
+	group.setLifeTime(0.5, 2);
 	group.setFriction(0.1);
-	group.setSize(0, ofxSPK::RangeF(30, 250));
+	group.setSize(0, ofxSPK::RangeF(10, 50));
 	
-	group.setGravity(ofVec3f(0, -10, 0));
-	group.setMass(0.1, 1);
+	//group.setGravity(ofVec3f(0, -10, 0));
+    group.setGravity(ofVec3f(0, 0, 0));
+    group.setMass(0.1, 1);
 	
-	rot.setup(SPK::Vortex::create(SPK::Vector3D(ofGetWidth()/2, ofGetHeight()/2),
+	/*rot.setup(SPK::Vortex::create(SPK::Vector3D(ofGetWidth()/2, ofGetHeight()/2),
 								  SPK::Vector3D(0, 1, 0),
 								  200,
 								  10), group);
-	
+	*/
+    
 	group.reserve(10000);
 }
 
@@ -49,9 +51,12 @@ void ofxObjectParticle::addMouse()
     group.emitRandom(2, ofVec3f(ofGetMouseX(), ofGetMouseY()));
 }
 
+void ofxObjectParticle::addPoint(ofVec3f _pos){
+    group.emitRandom(2, _pos);
+}
+
 void ofxObjectParticle::addPoint(int x,int y){
-    group.emitRandom(2, ofVec3f(x, y));
-    sys.update();
+    group.emitRandom(20, ofVec3f(x, y));
 }
 
 
