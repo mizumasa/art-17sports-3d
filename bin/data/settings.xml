@@ -1,0 +1,24 @@
+<SETTING>
+    <WINDOWMODE>1</WINDOWMODE>
+    <GAMEMODE>0</GAMEMODE>
+    <RIGHTIP>192.168.0.1</RIGHTIP>
+    <RIGHTMASK>R_chart.png</RIGHTMASK>
+    <LEFTMASK>L_chart.png</LEFTMASK>
+    <RIGHTMASK2>R_chart_t.png</RIGHTMASK2>
+    <LEFTMASK2>L_chart_t.png</LEFTMASK2>
+    <RIGHTVIDEO>
+        <VIDEO><NAME>1_1_R.mp4</NAME></VIDEO>
+        <VIDEO><NAME>2_1_R.mp4</NAME></VIDEO>
+        <VIDEO><NAME>3_1_R.mp4</NAME></VIDEO>
+        <VIDEO><NAME>4_1_R.mp4</NAME></VIDEO>
+    </RIGHTVIDEO>
+    <LEFTVIDEO>
+        <VIDEO><NAME>1_1_L.mp4</NAME></VIDEO>
+        <VIDEO><NAME>2_1_L.mp4</NAME></VIDEO>
+        <VIDEO><NAME>3_1_L.mp4</NAME></VIDEO>
+        <VIDEO><NAME>4_1_L.mp4</NAME></VIDEO>
+    </LEFTVIDEO>
+    <RED>200.215</RED>
+    <GREEN>200.547</GREEN>
+    <BLUE>0</BLUE>
+</SETTING>

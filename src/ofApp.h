@@ -21,11 +21,18 @@
 #include "ofxAssimpModelLoader.h"
 #include "ofxObjectParticle.h"
 
-#define USE_BLACKMAGIC 0
-#define BLACKMAGIC_W 1920
-#define BLACKMAGIC_H 1080
+#define USE_BLACKMAGIC 1
+//#define BLACKMAGIC_W 1920
+//#define BLACKMAGIC_H 1080
+//#define BLACKMAGIC_FPS 30
+#define BLACKMAGIC_W 1280
+#define BLACKMAGIC_H 720
+#define BLACKMAGIC_FPS 60
 #define WEBCAM_W 1280
 #define WEBCAM_H 720
+#define CAPTURE_W 1280
+#define CAPTURE_H 720
+
 
 #define MIR_X_NUM 5
 #define MIR_X_ANG 9*1.5
@@ -78,6 +85,7 @@ public:
 
     void setup();
     void update();
+    void update3D();
     void draw();
     void drawInput();
     void draw3D();
@@ -93,6 +101,15 @@ public:
     void windowResized(int w, int h);
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
+    void scheduleChange();
+    
+    void setupRight();
+    void updateRight();
+    void drawRight();
+    void setupLeft();
+    void updateLeft();
+    void drawLeft();
+
     bool b_UpdateFbo;
     bool b_GuiDraw;
     bool b_TestLight;
@@ -100,7 +117,6 @@ public:
     
     ofLight areaLight;
     ofLight ballLight;
-    ofPlanePrimitive plane;
     
     ofMaterial materialPlane;
     ofMaterial materialPlaneBlack;
@@ -140,6 +156,7 @@ public:
     
     ofxTimeLine timeline;
     int i_SceneID;
+    int i_SceneIDPre;
 
     ofxBlackMagic cam;
     ofVideoGrabber camMac;
@@ -157,5 +174,20 @@ public:
     
     ofFbo            myFbo;
     ofxPostGlitch    myGlitch;
+    
+    ofXml XML;
+    ofXml SCHEDULE;
+    int i_WindowMode;
+    int i_GameMode;
+    string s_RightIP;
+    
+    //vector<ofVideoPlayer> v_Player;
+    vector<ofxScheduleSeg> v_ScheduleSeg;
+    int i_NowScheduleId;
+    bool b_ScheduleStart;
+    bool b_SchedulePlaying;
+    ofImage i_BigSightMask;
+    ofImage i_BigSightMask2;
+    int i_BigSightMaskMode;
 };
 

@@ -16,7 +16,31 @@
  */
 //--------------------------------------------------------------
 void ofApp::setup(){
+    if(XML.load("settings.xml") ){cout << "setting loaded" <<endl;
+    }else{cout << "setting load error" <<endl;}
+    if(SCHEDULE.load("schedule.xml") ){cout << "setting loaded" <<endl;
+    }else{cout << "setting load error" <<endl;}
+    
+    if(XML.exists("//WINDOWMODE")) {i_WindowMode = XML.getValue<int>("//WINDOWMODE");
+    } else {i_WindowMode = 0;}
+    if(XML.exists("//GAMEMODE")) {i_GameMode = XML.getValue<int>("//GAMEMODE");
+    } else {i_GameMode = 0;}
+    cout << "xml setting : Window Mode=" << i_WindowMode <<" : Game Mode=" << i_GameMode <<endl;
+    switch(i_WindowMode){
+        case 0:
+            setupLeft();
+            break;
+        case 1:
+            setupRight();
+            break;
+    }
+    
+    i_NowScheduleId = 0;
+    b_ScheduleStart = false;
+    b_SchedulePlaying = false;
+    
     i_SceneID = 1;
+    i_SceneIDPre = 1;
     b_Render = false;
     i_Camera = 0;
     i_test = 0;
@@ -63,11 +87,7 @@ void ofApp::setup(){
     areaLight.setSpecularColor(ofFloatColor(0.4,0.4,0.4));
 	areaLight.setPosition(RADIUS,-RADIUS,0);
     areaLight.lookAt(ofVec3f(0,0,0), ofVec3f(0,0,1));
-	
-    plane.set(400,400,2,2);
-	plane.rotate(-90,ofVec3f(1,0,0));
-	plane.move(ofVec3f(0,-300,0));
-	
+		
     materialPlane.setAmbientColor(ofFloatColor(0.2,0.2,0.2,1.0));
 	materialPlane.setDiffuseColor(ofFloatColor(0.1,0.1,0.1,1.0));
 	materialPlane.setSpecularColor(ofFloatColor(1.0,1.0,1.0,1.0));
@@ -139,32 +159,15 @@ void ofApp::setup(){
         }
     }
     
-    for(int i = -(MIR_X_NUM/2) ;i<=(MIR_X_NUM/2) ;i++){
-        for(int j = 1 ;j<=(MIR_Y_NUM/2) ;j++){
-            ofxObjectHuman bufHuman;
-            bufHuman.setPos(180+i*MIR_X_ANG, -j*MIR_Y_ANG, RADIUS);
-            v_ObjectHuman.push_back(bufHuman);
-        }
-    }
 
-    for(int i = -(MIR_X_NUM/2) ;i<=(MIR_X_NUM/2) ;i++){
-        for(int j = 0 ;j<=(MIR_Y_NUM/2) ;j++){
-            ofxObjectLight bufLight;
-            bufLight.disable();
-            bufLight.setPos(180+i*MIR_X_ANG, j*MIR_Y_ANG, RADIUS);
-            bufLight.setAngle(i*MIR_X_ANG, -j*MIR_Y_ANG);
-            v_ObjectLight.push_back(bufLight);
-        }
-    }
+
+
     for(int i = 0;i<4 ;i++){
         ofxObjectLight bufLight;
         bufLight.disable();
         bufLight.setPos(180, 0, 100);
         bufLight.setAngle(0, 0);
         v_ObjectLight2.push_back(bufLight);
-    }
-    for(int i = 0; i<v_ObjectMirror.size(); i++){
-        v_ObjectMirror[i].setAngleBetween(v_ObjectLight[4].getPos(), v_Camera[0].getPosition());
     }
     
     ofSetCylinderResolution(24, 1);
@@ -203,10 +206,10 @@ void ofApp::setup(){
     gpuBlur.blurOverlayGain = 255;
     
     if(USE_BLACKMAGIC){
-        cam.setup(BLACKMAGIC_W, BLACKMAGIC_H, 30);
+        cam.setup(BLACKMAGIC_W, BLACKMAGIC_H, BLACKMAGIC_FPS);
     }else{
         camMac.setDeviceID(0);
-        camMac.setDesiredFrameRate(60);
+        camMac.setDesiredFrameRate(30);
         camMac.initGrabber(WEBCAM_W, WEBCAM_H);
     }
     b_CamStart = false;
@@ -215,38 +218,31 @@ void ofApp::setup(){
     receiver.setup(PORT);
     
     ballParticle.setup();
-    
+
     
     //Gritch
     lenna.loadImage("lenna.png");
-    bDrawLenna = false;
-    bShowHelp  = true;
+    bDrawLenna = true;
+    bShowHelp  = false;
     myFbo.allocate(512, 512);
     myGlitch.setup(&myFbo);
     
+    modelBall.setPos(ofVec3f(100,-100,0),ofVec3f(0,0,0));
+    i_BigSightMaskMode = 0;
 }
 
 //update--------------------------------------------------------------
 void ofApp::update(){
 	//areaLight.setPosition(0,-200,0);
-    for(int i = 0; i<v_ObjectMirror.size(); i++){
-        v_ObjectMirror[i].update(pi_AngleSpeed);
+    switch(i_WindowMode){
+        case 0:
+            updateLeft();
+            break;
+        case 1:
+            updateRight();
+            break;
     }
-    for(int i = 0; i<v_ObjectHuman.size(); i++){
-        v_ObjectHuman[i].update(pi_AngleSpeed);
-    }
-    for(int i = 0; i<v_ObjectLight.size(); i++){
-        v_ObjectLight[i].update(pi_AngleSpeed);
-    }
-    for(int i = 0; i<v_Camera.size(); i++){
-        v_Camera[i].update();
-        if(i==4){
-            ofVec3f ballPos;
-            ballPos = modelBall.getPos();
-            v_Camera[i].setPosition(ballPos+ofVec3f(0, -100,100));
-            v_Camera[i].lookAt(ballPos+ofVec3f(0, 0,0), ofVec3f(0,0,1));
-        }
-    }
+
     if(b_UpdateFbo){
         b_UpdateFbo = false;
         ofFbo::Settings s;
@@ -262,22 +258,6 @@ void ofApp::update(){
         gpuBlur.setup(s, false);
     }
     
-    
-    modelBall.update();
-    if(b_BallColor){
-        ballLight.setAmbientColor(ofFloatColor(0.1,sin(ofGetElapsedTimeMillis()/100.0)/2+0.5,cos(ofGetElapsedTimeMillis()/100.0)/2+0.5,1.0));
-        ballLight.setDiffuseColor(ofFloatColor(0.1,sin(ofGetElapsedTimeMillis()/100.0)/2+0.5,cos(ofGetElapsedTimeMillis()/100.0)/2+0.5,1.0));
-        ballLight.setSpecularColor(ofFloatColor(0.0f,sin(ofGetElapsedTimeMillis()/100.0)/2+0.5,cos(ofGetElapsedTimeMillis()/100.0)/2+0.5));
-    }else{
-        ballLight.setAmbientColor(ofFloatColor(0.1,0.1,1.0,1.0));
-        ballLight.setDiffuseColor(ofFloatColor(0.4,0.4,1.0));
-        ballLight.setSpecularColor(ofFloatColor(0.0f, 0.0f, 1.0f));
-    }
-    modelGoalBall.update();
-    objectEffect.update();
-
-    ballParticle.update();
-
     if(USE_BLACKMAGIC){
         if(cam.update()){
             timer.tick();
@@ -293,44 +273,155 @@ void ofApp::update(){
         camImg.setFromPixels(camPixels.getData(), BLACKMAGIC_W, BLACKMAGIC_H, OF_IMAGE_COLOR);
     }
 
+    if(b_ScheduleStart){
+        b_ScheduleStart = false;
+        v_ScheduleSeg[i_NowScheduleId].video.play();
+        b_SchedulePlaying = true;
+        i_SceneID = 3;
+    }
+    if(b_SchedulePlaying){
+        v_ScheduleSeg[i_NowScheduleId].video.update();
+    }
+    
     while(receiver.hasWaitingMessages()){
         ofxOscMessage m;
         receiver.getNextMessage(&m);
         if(m.getAddress() == "/mouse/position"){
-            int recX,recY;
-            recX = m.getArgAsInt32(0);
-            recY = m.getArgAsInt32(1);
-            cout << recX << ":"<< recY << endl;
+            int recX,recY,recScore;
+            recX = int((unsigned char)(m.getArgAsChar(0)));
+            recY = int((unsigned char)(m.getArgAsChar(1)));
+            recScore = int((unsigned char)(m.getArgAsChar(2)));
+            cout << recX << ":"<< recY << "=" << recScore << endl;
         }
-        if(m.getAddress() == "/start"){
+        if(m.getAddress() == "/debug/position"){
+            int recX,recY;
+            recX = int((unsigned char)(m.getArgAsChar(0)));
+            recY = int((unsigned char)(m.getArgAsChar(1)));
+            cout << "Debug Pos "<< recX << ":"<< recY << endl;
+        }
+        if(m.getAddress() == "/pose/start"){
             int recX;
             recX = m.getArgAsInt32(0);
             cout << "OSC start" << recX << endl;
         }
-        if(m.getAddress() == "/update"){
+        if(m.getAddress() == "/pose/update"){
             int recX;
             recX = m.getArgAsInt32(0);
             cout << m.getAddress() << recX << endl;
         }
+        if((i_SceneID == 2) and m.getAddress() == "/pose/subset"){
+            cout << "OSC got subset" << endl;
+        }
+        if((i_SceneID == 2) and m.getAddress() == "/pose/candidate"){
+            cout << "OSC got candidate" << m.getArgAsInt32(0) <<":"<<m.getArgAsInt32(1) <<":"<<m.getArgAsInt32(2) <<":"<<m.getArgAsInt32(3) << endl;
+            int detPosX,detPosY;
+            detPosX = int(ofGetWidth() * (m.getArgAsInt32(0) / OPENPOSE_RESIZE_RATE) / OPENPOSE_CAP_WIDTH);
+            detPosY = int(ofGetHeight() * (m.getArgAsInt32(1) / OPENPOSE_RESIZE_RATE) / OPENPOSE_CAP_HEIGHT);
+            ballParticle.addPoint(detPosX,detPosY);
+        }
     }
-    
+    switch(i_SceneID){
+        case 1:
+            update3D();
+            break;
+        case 2:
+            //drawInput();
+            ballParticle.update();
+            break;
+        case 3:
+            //v_ScheduleSeg[i_NowScheduleId].video.draw(0, 0, ofGetWidth(), ofGetHeight());
+            break;
+        case 4:
+            break;
+        default:
+            break;
+    }
+    if(i_SceneIDPre != i_SceneID){
+        ballParticle.setup();
+    }
+    i_SceneIDPre = i_SceneID;
 }
 
-//--------------------------------------------------------------
+//update--------------------------------------------------------------
+void ofApp::update3D(){
+    for(int i = 0; i<v_ObjectMirror.size(); i++){
+        v_ObjectMirror[i].update(pi_AngleSpeed);
+    }
+    for(int i = 0; i<v_Camera.size(); i++){
+        v_Camera[i].update();
+        if(i==4){
+            ofVec3f ballPos;
+            ballPos = modelBall.getPos();
+            v_Camera[i].setPosition(ballPos+ofVec3f(0, -100,100));
+            v_Camera[i].lookAt(ballPos+ofVec3f(0, 0,0), ofVec3f(0,0,1));
+        }
+    }
+    
+    modelBall.update();
+    if(b_BallColor){
+        ballLight.setAmbientColor(ofFloatColor(0.1,sin(ofGetElapsedTimeMillis()/100.0)/2+0.5,cos(ofGetElapsedTimeMillis()/100.0)/2+0.5,1.0));
+        ballLight.setDiffuseColor(ofFloatColor(0.1,sin(ofGetElapsedTimeMillis()/100.0)/2+0.5,cos(ofGetElapsedTimeMillis()/100.0)/2+0.5,1.0));
+        ballLight.setSpecularColor(ofFloatColor(0.0f,sin(ofGetElapsedTimeMillis()/100.0)/2+0.5,cos(ofGetElapsedTimeMillis()/100.0)/2+0.5));
+    }else{
+        ballLight.setAmbientColor(ofFloatColor(0.1,0.1,1.0,1.0));
+        ballLight.setDiffuseColor(ofFloatColor(0.4,0.4,1.0));
+        ballLight.setSpecularColor(ofFloatColor(0.0f, 0.0f, 1.0f));
+    }
+    modelGoalBall.update();
+    objectEffect.update();
+    ballParticle.addMouse();
+    ballParticle.update();
+
+}
+
+
+
+//draw--------------------------------------------------------------
 void ofApp::draw(){
+    switch(i_WindowMode){
+        case 0:
+            drawLeft();
+            break;
+        case 1:
+            drawRight();
+            break;
+    }
     switch(i_SceneID){
         case 1:
             draw3D();
             break;
         case 2:
             drawInput();
+            ballParticle.draw();
             break;
         case 3:
+            v_ScheduleSeg[i_NowScheduleId].video.draw(0, 0, ofGetWidth(), ofGetHeight());
             break;
         case 4:
             break;
         default:
             break;
+    }
+    ofEnableAlphaBlending();
+    if(i_BigSightMaskMode==0)i_BigSightMask.draw(0,0,ofGetWidth(),ofGetHeight());
+    if(i_BigSightMaskMode==1)i_BigSightMask2.draw(0,0,ofGetWidth(),ofGetHeight());
+    if(b_GuiDraw){
+        ofPushStyle();
+        ofDisableLighting();
+        ofDisableDepthTest();
+        ofSetColor(255, 255, 255,255);
+        ofTranslate(0,ofGetHeight()/2);
+        gui.draw();
+        ofPopStyle();
+        ofSetColor(255, 255, 255,255);
+
+        string info = "";
+        info += "Framerate:"+ofToString(ofGetFrameRate())+"\n";
+        info += "window size :"+ofToString(ofGetWidth())+"x"+ofToString(ofGetHeight())+"\n";
+        info += ofToString(v_ScheduleSeg[i_NowScheduleId].s_Name)+"\n";
+        info += " ";
+        ofSetColor(255,255,255);
+        ofDrawBitmapString(info, 20,gui.getHeight()+50);
     }
 }
 
@@ -375,19 +466,19 @@ void ofApp::drawInput(){
         ofSetColor(255);
         int drawHeight;
         drawHeight = int(ofGetWidth()*camImg.getHeight()/camImg.getWidth());
-        camImg.draw(0,int((ofGetHeight()-drawHeight)/2),-2, ofGetWidth(), drawHeight);
+        camImg.draw(-100,-100+int((ofGetHeight()-drawHeight)/2),-2, ofGetWidth(), drawHeight);
     }
     myFbo.end();
 
     ofSetColor(255);
-    myFbo.draw(0, 0);
+    //myFbo.draw(0, 0);
     
     /* Apply effects */
     myGlitch.generateFx();
     
     /* draw effected view */
     ofSetColor(255);
-    myFbo.draw(512, 0);
+    myFbo.draw(100, 100);
     
     
     /* show information*/
@@ -520,9 +611,7 @@ void ofApp::draw3D(){
     
 
     
-    for(int i = 0; i<v_ObjectLight.size(); i++){
-        v_ObjectLight[i].draw();
-    }
+
     
 	if(!b_TestLight)areaLight.draw();
     if(b_TestLight)testLight.draw();
@@ -553,68 +642,53 @@ void ofApp::draw3D(){
     ofPopStyle();
 
     
+    
     ofSetColor(255, 255, 255,255);//this color is applied to gpuBlur.beginDrawScene();
 
-    if(b_GuiDraw){
-        ofPushStyle();
-        ofDisableLighting();
-        ofDisableDepthTest();
-        ofSetColor(255, 255, 255,255);
-        gui.draw();
-        ofPopStyle();
-        ofSetColor(255, 255, 255,255);
-        string msg;
-        msg = ofToString(ofGetFrameRate());
-        ofDrawBitmapString(msg, 200, 20);
-    }else{
-        gpuBlur.beginDrawScene();
-        ofClear(0, 0, 0, 0);
-        
-        v_Camera[i_Camera].begin();
-        ofSetColor(255, 255, 255,255);
-        for(int i = 0; i<v_ObjectMirror.size(); i++){
-            v_ObjectMirror[i].drawLineTo(v_ObjectLight[4].getPos());
-            //v_ObjectMirror[i].drawLineTo(v_ObjectLight[7].getPos());
-        }
-        if(0){
-            for(int i = 0; i<v_ObjectLight.size(); i++){
-                v_ObjectLight[i].drawLineDirMulti(v_ObjectLight[i].getNorm()*800);
-            }
-        }
-        for(int i = 0; i<v_ObjectLight2.size(); i++){
-            ofPushMatrix();
-            ofTranslate((i%2)*200-100, int(i/2)*300-150);
-            ofRotateZ(int(i/2)*180.0);
-            if(i==1 or i==2){
-                ofRotateZ(20.0);
-            }else{
-                ofRotateZ(-20.0);
-            }
-            ofRotateX(-20.0);
-            v_ObjectLight2[i].drawLineDirMulti(v_ObjectLight2[i].getNorm()*250);
-            ofPopMatrix();
-        }
-
-        /*for(int i = 0; i<v_ObjectLight.size(); i++){
-            for(int j = 0; j<v_ObjectMirror.size(); j++){
-                v_ObjectMirror[j].drawLineTo(v_ObjectLight[i].getPos());
-                //v_ObjectLight[i].drawLineDirMulti(v_ObjectLight[i].getNorm()*100);
-            }
-        }*/
-        objectEffect.draw();
-        v_Camera[i_Camera].end();
-        
-        gpuBlur.endDrawScene();
-        gpuBlur.performBlur();
-        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA); //pre-multiplied alpha
-        gpuBlur.drawBlurFbo();
-
+    testLight.enable();
+    gpuBlur.beginDrawScene();
+    ofClear(0, 0, 0, 0);
+    
+    v_Camera[i_Camera].begin();
+    ofSetColor(255, 255, 255,255);
+    for(int i = 0; i<v_ObjectMirror.size(); i++){
+        v_ObjectMirror[i].drawLineTo(ofVec3f(0,-RADIUS,0));
     }
+    
+    for(int i = 0; i<v_ObjectLight2.size(); i++){
+        ofPushMatrix();
+        ofTranslate((i%2)*200-100, int(i/2)*300-150);
+        ofRotateZ(int(i/2)*180.0);
+        if(i==1 or i==2){
+            ofRotateZ(20.0);
+        }else{
+            ofRotateZ(-20.0);
+        }
+        ofRotateX(-20.0);
+        v_ObjectLight2[i].drawLineDirMulti(v_ObjectLight2[i].getNorm()*250);
+        ofPopMatrix();
+    }
+    
+    objectEffect.draw();
+    v_Camera[i_Camera].end();
+    
+    gpuBlur.endDrawScene();
+    gpuBlur.performBlur();
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA); //pre-multiplied alpha
+    gpuBlur.drawBlurFbo();
+    
+    testLight.disable();
+    
+
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
 	switch(key){
+        case ' ':
+            b_ScheduleStart = true;
+            cout << i_NowScheduleId << " start"<<endl;
+            break;
         case 'e':
             objectEffect.add(ofVec3f(ofRandom(-80,80),ofRandom(-120,100),GROUND_LEVEL));
             break;
@@ -636,11 +710,12 @@ void ofApp::keyPressed(int key){
             modelBall.throwTo(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT),20);
             break;
         case OF_KEY_UP:
-            for(int i = 0; i<v_ObjectMirror.size(); i++){
-                v_ObjectMirror[i].setRandomAngle();
-            }
+            i_NowScheduleId = MAX(0,i_NowScheduleId-1);
+            scheduleChange();
             break;
         case OF_KEY_DOWN:
+            i_NowScheduleId = MIN(v_ScheduleSeg.size()-1,i_NowScheduleId+1);
+            scheduleChange();
             break;
         case OF_KEY_LEFT:
             break;
@@ -666,6 +741,9 @@ void ofApp::keyPressed(int key){
         case '9':
             i_test -= 1;
             break;
+        case 'm':
+            i_BigSightMaskMode = (i_BigSightMaskMode+1)%3;
+            break;
         case 'c':
             //b_Camera = !b_Camera;
             i_Camera = (i_Camera +1)%v_Camera.size();
@@ -680,8 +758,9 @@ void ofApp::keyPressed(int key){
         case 'b':
             b_BallColor = !b_BallColor;
             break;
+
 	}
-    if (key == '1') myGlitch.setFx(OFXPOSTGLITCH_CONVERGENCE    , true);
+    if (key == '-') myGlitch.setFx(OFXPOSTGLITCH_CONVERGENCE    , true);
     if (key == '2') myGlitch.setFx(OFXPOSTGLITCH_GLOW            , true);
     if (key == '3') myGlitch.setFx(OFXPOSTGLITCH_SHAKER            , true);
     if (key == '4') myGlitch.setFx(OFXPOSTGLITCH_CUTSLIDER        , true);
@@ -707,7 +786,7 @@ void ofApp::keyPressed(int key){
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
-    if (key == '1') myGlitch.setFx(OFXPOSTGLITCH_CONVERGENCE    , false);
+    if (key == '-') myGlitch.setFx(OFXPOSTGLITCH_CONVERGENCE    , false);
     if (key == '2') myGlitch.setFx(OFXPOSTGLITCH_GLOW            , false);
     if (key == '3') myGlitch.setFx(OFXPOSTGLITCH_SHAKER            , false);
     if (key == '4') myGlitch.setFx(OFXPOSTGLITCH_CUTSLIDER        , false);
@@ -735,12 +814,16 @@ void ofApp::mouseMoved(int x, int y ){
 
 //--------------------------------------------------------------
 void ofApp::mouseDragged(int x, int y, int button){
-
+    if(i_SceneID == 2){
+        ballParticle.addPoint(x,y);
+    }
 }
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
-
+    if(i_SceneID == 2){
+        ballParticle.addPoint(x,y);
+    }
 }
 
 //--------------------------------------------------------------
@@ -767,6 +850,15 @@ void ofApp::windowResized(int w, int h){
 void ofApp::gotMessage(ofMessage msg){
 
 }
+
+void ofApp::scheduleChange(){
+    for(int i =0;i<v_ScheduleSeg.size();i++){
+        if(v_ScheduleSeg[i].actMode == ACT_MODE_MOVIE){
+            if(v_ScheduleSeg[i].video.isPlaying())v_ScheduleSeg[i].video.stop();
+        }
+    }
+}
+
 
 //--------------------------------------------------------------
 void ofApp::dragEvent(ofDragInfo dragInfo){ 

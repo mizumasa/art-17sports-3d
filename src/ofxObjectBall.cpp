@@ -23,13 +23,13 @@ void ofxObjectBall::update(){
         vf_Pos[2]=GROUND_LEVEL;
         vf_Speed[2] = -vf_Speed[2]*2/3;
         //vf_Pos[2] = GROUND_LEVEL;
-        vf_Speed[0] = vf_Speed[0]/2;
-        vf_Speed[1] = vf_Speed[1]/2;
+        vf_Speed[0] = vf_Speed[0]/1.5;
+        vf_Speed[1] = vf_Speed[1]/1.5;
     }
     if(vf_Pos[1]>COURT_HEIGHT_HALF){
         vf_Pos[1]=COURT_HEIGHT_HALF;
         vf_Speed[1] = -vf_Speed[1]*2/3;
-        vf_Speed[0] = vf_Speed[0]/2;
+        vf_Speed[0] = vf_Speed[0]/1.5;
         vf_Speed[2] = vf_Speed[2]/2;
     }
     if(b_GoalLoop){

@@ -11,6 +11,8 @@ class ofxObjectParticle{
 public:
 	void setup();
 	void update();
+    void addMouse();
+    void addPoint(int x,int y);
 	void draw();
 };
 #endif  

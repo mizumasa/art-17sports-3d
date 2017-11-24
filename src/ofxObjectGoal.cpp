@@ -21,6 +21,7 @@ void ofxObjectGoal::draw(){
 
     ofRotateX(-90);
     ofRotateY(-180);
+    ofScale(0.45955,0.45955,0.45955);
     model.drawFaces();
     ofPopStyle();
     ofPopMatrix();

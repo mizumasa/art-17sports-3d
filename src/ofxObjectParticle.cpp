@@ -41,12 +41,19 @@ void ofxObjectParticle::setup()
 //--------------------------------------------------------------
 void ofxObjectParticle::update()
 {
-	group.emitRandom(10, ofVec3f(ofGetMouseX(), ofGetMouseY()));
-	
 	sys.update();
-
-	ofSetWindowTitle(ofToString(ofGetFrameRate()));
 }
+
+void ofxObjectParticle::addMouse()
+{
+    group.emitRandom(2, ofVec3f(ofGetMouseX(), ofGetMouseY()));
+}
+
+void ofxObjectParticle::addPoint(int x,int y){
+    group.emitRandom(2, ofVec3f(x, y));
+    sys.update();
+}
+
 
 //--------------------------------------------------------------
 void ofxObjectParticle::draw()
