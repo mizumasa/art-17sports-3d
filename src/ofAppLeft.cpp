@@ -27,6 +27,38 @@ void ofApp::setupLeft(){
         }
         while( XML.setToSibling() ); // go to the next STROKE
     }
+    
+    if(SCHEDULE.exists("LEFTSCHEDULE"))
+    {
+        SCHEDULE.setTo("LEFTSCHEDULE[0]");
+        do {
+            if(SCHEDULE.getName() == "LEFTSCHEDULE" && SCHEDULE.setTo("SEG[0]")){
+                do{
+                    int i_buf = SCHEDULE.getValue<int>("ACTMODE");
+                    string buf = SCHEDULE.getValue<string>("NAME");
+                    //cout << i_buf <<":"<< buf << endl;
+                    ofxScheduleSeg segBuf;
+                    segBuf.s_Name = buf;
+                    segBuf.actMode = (ACT_MODE)(i_buf);
+                    switch(i_buf){
+                        case 0:
+                            cout << "video load" << buf <<endl;
+                            segBuf.video.load("movie/"+buf);
+                            segBuf.video.setLoopState(OF_LOOP_NONE);
+                            break;
+                        case 1:
+                            cout << "scene load" << buf << endl;
+                            break;
+                    }
+                    v_ScheduleSeg.push_back(segBuf);
+                }
+                while(SCHEDULE.setToSibling()); // go the next PT
+                SCHEDULE.setToParent();
+            }
+        }
+        while( SCHEDULE.setToSibling() ); // go to the next STROKE
+    }
+    
 }
 
 void ofApp::updateLeft(){

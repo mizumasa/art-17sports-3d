@@ -163,6 +163,9 @@ void ofxObjectBall::setGravity(float _gravity){
 void ofxObjectBall::togglePose(){
     b_Pose = !b_Pose;
 }
+void ofxObjectBall::clearPose(){
+    b_Pose = false;;
+}
 
 void ofxObjectBall::startReplay(){
     i_ReplayCount = 1;

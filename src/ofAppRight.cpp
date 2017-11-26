@@ -47,6 +47,7 @@ void ofApp::setupRight(){
                         case 0:
                             cout << "video load" << buf <<endl;
                             segBuf.video.load("movie/"+buf);
+                            segBuf.video.setLoopState(OF_LOOP_NONE);
                             break;
                         case 1:
                             cout << "scene load" << buf << endl;

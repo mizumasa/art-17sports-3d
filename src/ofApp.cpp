@@ -38,7 +38,10 @@ void ofApp::setup(){
     
     bgm.load("bgm.mp3");
     bgm.setVolume(1.0);
-    
+    buzzer.load("buzzer.wav");
+    buzzer.setVolume(1.0);
+    buzzer.setLoop(false);
+
     i_NowScheduleId = 0;
     b_ScheduleStart = false;
     b_SchedulePlaying = false;
@@ -295,9 +298,15 @@ void ofApp::update(){
         if(i_NowScheduleId==0){
             bgm.play();
         }
+        if(i_NowScheduleId==(v_ScheduleSeg.size()-2)){
+            buzzer.play();
+        }
         switch(v_ScheduleSeg[i_NowScheduleId].actMode){
             case ACT_MODE_CG:
                 i_SceneID = 1;
+                changeToField();
+                modelGoalBall.clearPose();
+                modelBall.clearPose();
                 break;
             case ACT_MODE_CAPTURE:
                 i_SceneID = 2;
@@ -309,6 +318,14 @@ void ofApp::update(){
                 break;
             default:
                 break;
+        }
+        if(v_ScheduleSeg[i_NowScheduleId].s_Name=="CG2fail"){
+            cout << "CG 2 fail"<<endl;
+            changeToGoal();
+        }
+        if(v_ScheduleSeg[i_NowScheduleId].s_Name=="CG 2 success"){
+            cout << "CG 2 success"<<endl;
+            changeToGoal();
         }
     }
     if(b_SchedulePlaying){
@@ -585,7 +602,7 @@ void ofApp::draw3D(){
             ofTranslate(4.5, 0,0);
             ofRotateX(-90);
             ofSetColor(0, 0, 0, 128);
-            model.drawFaces();
+            //model.drawFaces();
             ofPopMatrix();
             ofPopStyle();
 
@@ -794,7 +811,7 @@ void ofApp::keyPressed(int key){
         case '[':
             modelBall.clearHistory();
             modelBall.setPos(ofVec3f(0,-COURT_HEIGHT_HALF,GROUND_LEVEL),ofVec3f(0,0,0));
-            modelBall.throwTo(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT+100),10);
+            modelBall.throwTo(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT+200),12);
             break;
         case ']':
             modelBall.clearHistory();
@@ -839,6 +856,8 @@ void ofApp::keyPressed(int key){
             }else{
                 changeToGoal();
             }
+            modelGoalBall.clearPose();
+            modelBall.clearPose();
             for(int i = 0;i<v_Camera.size();i++){
                 if(i_Camera == i){
                     v_Camera[i].enableMouseInput();

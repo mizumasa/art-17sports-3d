@@ -34,6 +34,7 @@ public:
     uint64_t t_Count;
 
     void togglePose();
+    void clearPose();
     void startReplay();
     void startReverse();
     void clearHistory();

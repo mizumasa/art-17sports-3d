@@ -21,7 +21,7 @@
 #include "ofxAssimpModelLoader.h"
 #include "ofxObjectParticle.h"
 
-#define USE_BLACKMAGIC 0
+#define USE_BLACKMAGIC 1
 //#define BLACKMAGIC_W 1920
 //#define BLACKMAGIC_H 1080
 //#define BLACKMAGIC_FPS 30
@@ -192,5 +192,6 @@ public:
     ofImage i_BigSightMask2;
     int i_BigSightMaskMode;
     ofSoundPlayer bgm;
+    ofSoundPlayer buzzer;
 };
 
