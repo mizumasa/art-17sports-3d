@@ -661,8 +661,12 @@ void ofApp::draw3D(){
 
     ofBackground(0,0,0);
     
-
-    v_Camera[i_Camera].begin();
+    ofRectangle viewport3D;
+    viewport3D.x = 0;
+    viewport3D.y = - ofGetHeight()/3;
+    viewport3D.width = ofGetWidth();
+    viewport3D.height = ofGetHeight()*4/3;
+    v_Camera[i_Camera].begin(viewport3D);
     
     if(b_TestLight){
         testLight.enable();
@@ -705,7 +709,9 @@ void ofApp::draw3D(){
         }
         {
             ofPushMatrix();
-            //ofTranslate(0,pf_Buf3*pf_Buf2 ,pf_Buf5*pf_Buf6);
+            //ofTranslate(0,0,pf_Buf5*pf_Buf6*pf_Buf2);
+            modelGoal.draw();
+            ofRotateZ(180);
             modelGoal.draw();
             ofPopMatrix();
         }
@@ -800,8 +806,13 @@ void ofApp::draw3D(){
     gpuBlur.beginDrawScene();
     ofClear(0, 0, 0, 0);
     
-    v_Camera[i_Camera].begin();
-    ofSetColor(255, 255, 255,255);
+    ofRectangle viewport3D2;
+    viewport3D2.x = 0;
+    viewport3D2.y = 0;
+    viewport3D2.width = ofGetWidth();
+    viewport3D2.height = ofGetHeight()*4/3;
+    v_Camera[i_Camera].begin(viewport3D2);
+    ofSetColor(255, 240, 230);
     for(int i = 0; i<v_ObjectMirror.size(); i++){
         v_ObjectMirror[i].drawLineTo(ofVec3f(0,-RADIUS,0));
     }
@@ -816,6 +827,11 @@ void ofApp::draw3D(){
             ofRotateZ(-20.0);
         }
         ofRotateX(-20.0);
+        if( int(i/2) == 0){
+            ofSetColor(255, 240, 230);
+        }else{
+            ofSetColor(255, 200, 190);
+        }
         v_ObjectLight2[i].drawLineDirMulti(v_ObjectLight2[i].getNorm()*250);
         ofPopMatrix();
     }
