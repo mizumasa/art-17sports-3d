@@ -7,6 +7,7 @@
 #include "ofxObjectCamera.h"
 #include "ofxObjectGoal.h"
 #include "ofxObjectBall.h"
+#include "ofxObjectPanel.h"
 #include "ofxObjectEffect.h"
 #include "ofxGui.h"
 #include "ofxBlackMagic.h"
@@ -21,7 +22,9 @@
 #include "ofxAssimpModelLoader.h"
 #include "ofxObjectParticle.h"
 
-#define USE_BLACKMAGIC 1
+
+
+#define USE_BLACKMAGIC 0
 //#define BLACKMAGIC_W 1920
 //#define BLACKMAGIC_H 1080
 //#define BLACKMAGIC_FPS 30
@@ -193,5 +196,8 @@ public:
     int i_BigSightMaskMode;
     ofSoundPlayer bgm;
     ofSoundPlayer buzzer;
+    vector<ofxObjectPanel> v_ObjectPanel;
+    int i_PanelScore;
 };
+
 
