@@ -8,7 +8,7 @@
 #define GROUND_LEVEL -55
 #define COURT_WIDTH_HALF 86
 #define COURT_HEIGHT_HALF 142
-#define GOAL_HEIGHT 130
+#define GOAL_HEIGHT 40
 //#define GOAL_Y_OFFSET 20
 #define GOAL_Y_OFFSET 10
 
