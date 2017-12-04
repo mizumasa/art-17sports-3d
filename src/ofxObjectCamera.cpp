@@ -3,7 +3,7 @@
 //--------------------------------------------------------------
 ofxObjectCamera::ofxObjectCamera(){
     b_AutoMove=false;
-    b_ChaseBall=false;
+    i_ChaseBallID=0;
     i_Mode = 0;
     i_AutoCount = 0;
     f_PosPan = 0;
@@ -18,12 +18,12 @@ void ofxObjectCamera::setAutoMove(){
 }
 
 //--------------------------------------------------------------
-void ofxObjectCamera::setChaseBall(){
-    b_ChaseBall=true;
+void ofxObjectCamera::setChaseBall(int _val){
+    i_ChaseBallID=_val;
 }
 //--------------------------------------------------------------
-bool ofxObjectCamera::getChaseBall(){
-    return b_ChaseBall;
+int ofxObjectCamera::getChaseBall(){
+    return i_ChaseBallID;
 }
 
 //--------------------------------------------------------------

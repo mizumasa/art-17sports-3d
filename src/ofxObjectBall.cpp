@@ -10,14 +10,16 @@ ofxObjectBall::ofxObjectBall(){
     vf_Gravity = ofVec3f(0, 0, -0.2);
     b_GoalLoop = false;
     t_Count = 0;
+    b_NoResistance = false;
 }
 
 //--------------------------------------------------------------
 void ofxObjectBall::update(){
     t_Count += 1;
+    
     if(!b_Pose){
         vf_Speed += vf_Gravity;
-        vf_Speed -= vf_Speed/80.0;
+        if(!b_NoResistance)vf_Speed -= vf_Speed/80.0;
         vf_Rotate += vf_RotateSpeed;
         vf_Pos += vf_Speed;
         if(vf_Pos[2]<GROUND_LEVEL){
@@ -132,12 +134,17 @@ void ofxObjectBall::setSpeed(ofVec3f _vf_Speed){
 void ofxObjectBall::throwTo(ofVec3f _vf_Pos, float _speed){
     vf_Speed = (_vf_Pos - vf_Pos);
     vf_Speed = _speed * vf_Speed / vf_Speed.length();
+    t_Count = 0;
 }
 
 void ofxObjectBall::setGoalLoop(){
     b_GoalLoop = true;
     f_SlowCount = 0;
     f_SlowCountSum = 0;
+}
+
+void ofxObjectBall::setNoResistance(){
+    b_NoResistance = true;
 }
 
 void ofxObjectBall::startGoalLoopSlow(){

@@ -29,6 +29,7 @@ public:
     ofVec3f getPos();
     void noGravity();
     void setGoalLoop();
+    void setNoResistance();
     void startGoalLoopSlow();
     void setGravity(float _gravity);
     uint64_t t_Count;
@@ -56,6 +57,7 @@ private:
     vector<ofVec3f> vv_RouteHistory;
     int i_NowHistoryPos;
     bool b_Pose;
+    bool b_NoResistance;
 };
 
 #endif

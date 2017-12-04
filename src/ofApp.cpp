@@ -1,6 +1,6 @@
 #include "ofApp.h"
 
-/* simple model space
+/* simple model space   
      ^ tilt+
      |
      z+  y+
@@ -234,7 +234,16 @@ void ofApp::setup(){
         camBuf.setFarClip(20000);
         camBuf.setPosition(0, -RADIUS,0);
         camBuf.lookAt(ofVec3f(0,RADIUS,GROUND_LEVEL), ofVec3f(0,0,1));
-        camBuf.setChaseBall();
+        camBuf.setChaseBall(1);
+        camBuf.setFov(50);
+        v_Camera.push_back(camBuf);
+    }
+    {
+        ofxObjectCamera camBuf;
+        camBuf.setFarClip(20000);
+        camBuf.setPosition(0, -RADIUS,0);
+        camBuf.lookAt(ofVec3f(0,RADIUS,GROUND_LEVEL), ofVec3f(0,0,1));
+        camBuf.setChaseBall(2);
         camBuf.setFov(50);
         v_Camera.push_back(camBuf);
     }
@@ -329,6 +338,9 @@ void ofApp::setup(){
     myGlitch.setup(&myFbo);
     
     modelBall.setPos(ofVec3f(100,-100,0),ofVec3f(0,0,0));
+    modelGameBall.noGravity();
+    modelGameBall.setNoResistance();
+    
     i_BigSightMaskMode = 0;
     
     i_PanelScore = 0;
@@ -483,6 +495,10 @@ void ofApp::update(){
         ballParticle.setup();
     }
     i_SceneIDPre = i_SceneID;
+
+    if(b_GuiDraw and (modelGameBall.t_Count%30==0)){
+        cout <<"{"<< modelGameBall.getPos() <<"},"<< endl;
+    }
 }
 
 //update--------------------------------------------------------------
@@ -492,15 +508,25 @@ void ofApp::update3D(){
     }
     for(int i = 0; i<v_Camera.size(); i++){
         v_Camera[i].update();
-        if(v_Camera[i].getChaseBall()){
+        if(v_Camera[i].getChaseBall() > 0){
             ofVec3f ballPos;
-            ballPos = modelBall.getPos();
-            v_Camera[i].setPosition(ballPos+ofVec3f(0, -100,100));
-            v_Camera[i].lookAt(ballPos+ofVec3f(0, 0,0), ofVec3f(0,0,1));
+            switch(v_Camera[i].getChaseBall()){
+                case 1:
+                    ballPos = modelBall.getPos();
+                    v_Camera[i].setPosition(ballPos+ofVec3f(0, -100,100));
+                    v_Camera[i].lookAt(ballPos+ofVec3f(0, 0,0), ofVec3f(0,0,1));
+                    break;
+                default://2
+                    ballPos = modelGameBall.getPos();
+                    v_Camera[i].setPosition(ballPos+ofVec3f(0, -50,-14));
+                    v_Camera[i].lookAt(ballPos+ofVec3f(0,0,0), ofVec3f(0,0,1));
+                    break;
+            }
         }
     }
     
     modelBall.update();
+    modelGameBall.update();
     if(b_BallColor and !modelBall.isReversePlaying() and !modelGoalBall.isReversePlaying()){
         ballLight.setAmbientColor(ofFloatColor(0.1,sin(ofGetElapsedTimeMillis()/100.0)/2+0.5,cos(ofGetElapsedTimeMillis()/100.0)/2+0.5,1.0));
         ballLight.setDiffuseColor(ofFloatColor(0.1,sin(ofGetElapsedTimeMillis()/100.0)/2+0.5,cos(ofGetElapsedTimeMillis()/100.0)/2+0.5,1.0));
@@ -512,6 +538,7 @@ void ofApp::update3D(){
     }
     modelGoalBall.update();
     objectEffect.update();
+    objectRing.update();
     //ballParticle.addMouse();
     if(b_BallColor and !modelBall.isReversePlaying() and !modelGoalBall.isReversePlaying()){
         ballParticle.addPoint(modelBall.getPos());
@@ -727,6 +754,7 @@ void ofApp::draw3D(){
                 modelGoalBall.draw();
             }else{
                 modelBall.draw();
+                modelGameBall.draw();
             }
             ballLight.disable();
 
@@ -736,6 +764,7 @@ void ofApp::draw3D(){
             ofPopMatrix();
         }
         objectEffect.draw();
+        objectRing.draw();
         {
             ofPushMatrix();
             ofTranslate(0, 0,GROUND_LEVEL);
@@ -928,6 +957,11 @@ void ofApp::keyPressed(int key){
         case 'j':
             //modelBall.setSpeed(ofVec3f(0,0,5));
             modelBall.throwTo(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT+40),13);
+            break;
+        case 'y':
+            //modelBall.setSpeed(ofVec3f(0,0,5));
+            modelGameBall.setPos(ofVec3f(0,-COURT_HEIGHT_HALF+40,GROUND_LEVEL+10),ofVec3f(2,2,0));
+            modelGameBall.throwTo(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT),0.5);
             break;
         case '[':
             modelBall.clearHistory();

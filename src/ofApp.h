@@ -9,6 +9,7 @@
 #include "ofxObjectBall.h"
 #include "ofxObjectPanel.h"
 #include "ofxObjectEffect.h"
+#include "ofxObjectRing.h"
 #include "ofxGui.h"
 #include "ofxBlackMagic.h"
 #include "common.h"
@@ -156,9 +157,11 @@ public:
     bool b_BallColor;
     ofxObjectParticle ballParticle;
     ofxObjectBall modelGoalBall;//goal boal
+    ofxObjectBall modelGameBall;
 
     ofxObjectEffects objectEffect;
-    
+    ofxObjectRings objectRing;
+
     ofxTimeLine timeline;
     int i_SceneID;
     int i_SceneIDPre;
