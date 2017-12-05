@@ -194,28 +194,30 @@ void ofApp::setup(){
     {
         ofxObjectCamera camBuf;
         camBuf.setFarClip(20000);
-        camBuf.setPosition(50, -50,70);
-        camBuf.lookAt(ofVec3f(0,0,-200), ofVec3f(0,0,1));
-        camBuf.setDistance(300.0);
-        camBuf.setFov(70);
-        v_Camera.push_back(camBuf);
-    }
-    {
-        ofxObjectCamera camBuf;
-        camBuf.setFarClip(20000);
-        camBuf.setPosition(0, -RADIUS/sqrt(2.0),0);
-        camBuf.lookAt(ofVec3f(0,RADIUS,300), ofVec3f(0,0,1));
         camBuf.setDistance(150.0);
-        camBuf.setFov(50);
+        camBuf.setPosition(-2, -28,-32);
+        camBuf.lookAt(ofVec3f(-57,60,-16), ofVec3f(0,0,1));
+        camBuf.setFov(100);
+        v_Camera.push_back(camBuf);
+        
+    }
+    {
+        ofxObjectCamera camBuf;
+        camBuf.setFarClip(20000);
+        camBuf.setDistance(150.0);
+        camBuf.setPosition(78, 172,88);
+        camBuf.lookAt(ofVec3f(-26,98,-6), ofVec3f(0,0,1));
+        camBuf.setFov(53);
         v_Camera.push_back(camBuf);
     }
     {
         ofxObjectCamera camBuf;
         camBuf.setFarClip(20000);
-        camBuf.setPosition(0, -RADIUS*4,RADIUS);
-        camBuf.lookAt(ofVec3f(0,-RADIUS*3,GROUND_LEVEL), ofVec3f(0,0,1));
-        camBuf.setDistance(250.0);
-        camBuf.setFov(80);
+        camBuf.setDistance(150.0);
+        camBuf.setPosition(0,0,0);
+        camBuf.lookAt(ofVec3f(0,10,GROUND_LEVEL), ofVec3f(0,0,1));
+        camBuf.setChaseBall(3);
+        camBuf.setFov(60);
         v_Camera.push_back(camBuf);
     }
     {
@@ -303,10 +305,13 @@ void ofApp::setup(){
     gui.add(pi_AngleSpeed.setup("Angle Speed", 5, 1, 10));
     gui.add(pf_Buf1.setup("pf_Buf1", 10, -100.0, 100.0));
     gui.add(pf_Buf2.setup("pf_Buf2", 10, -100.0, 100.0));
-    gui.add(pf_Buf3.setup("pf_Buf3", 1, 1, 100.0));
-    gui.add(pf_Buf4.setup("pf_Buf4", 1, 1, 100.0));
-    gui.add(pf_Buf5.setup("pf_Buf5", 1, 1, 100.0));
-    gui.add(pf_Buf6.setup("pf_Buf6", 1, 0.01, 10.0));
+    gui.add(pf_Buf3.setup("pf_Buf3", 1, -100.0, 100.0));
+    gui.add(pf_Buf4.setup("pf_Buf4", 1, -100.0, 100.0));
+    gui.add(pf_Buf5.setup("pf_Buf5", 1, -100.0, 100.0));
+    gui.add(pf_Buf6.setup("pf_Buf6", 1, -100.0, 100.0));
+    gui.add(pf_Buf7.setup("pf_Buf7", 1, -100.0, 100.0));
+    gui.add(pf_Buf8.setup("pf_Buf8", 1, -100.0, 100.0));
+    gui.add(pf_Buf9.setup("pf_Buf9", 1, -100.0, 100.0));
     gui.setPosition(0,ofGetHeight()/2);
     b_GuiDraw = false;
     
@@ -508,6 +513,13 @@ void ofApp::update3D(){
     }
     for(int i = 0; i<v_Camera.size(); i++){
         v_Camera[i].update();
+        if(0){
+            v_Camera[i].setPosition(pf_Buf1*2, pf_Buf2*2,pf_Buf3*2);
+            v_Camera[i].lookAt(ofVec3f(pf_Buf4,pf_Buf5,pf_Buf6), ofVec3f(0,0,1));
+            v_Camera[i].setFov(pf_Buf7);
+        }
+
+        //v_Camera[i].setFov(pf_Buf1);
         if(v_Camera[i].getChaseBall() > 0){
             ofVec3f ballPos;
             switch(v_Camera[i].getChaseBall()){
@@ -516,12 +528,22 @@ void ofApp::update3D(){
                     v_Camera[i].setPosition(ballPos+ofVec3f(0, -100,100));
                     v_Camera[i].lookAt(ballPos+ofVec3f(0, 0,0), ofVec3f(0,0,1));
                     break;
-                default://2
+                case 2:
                     ballPos = modelGameBall.getPos();
                     v_Camera[i].setPosition(ballPos+ofVec3f(0, -50,-14));
                     v_Camera[i].lookAt(ballPos+ofVec3f(0,0,0), ofVec3f(0,0,1));
                     break;
+                default://3
+                    ballPos = modelBall.getPos();
+                    v_Camera[i].setPosition(ofVec3f(50, -22,-44));
+                    v_Camera[i].lookAt(ballPos+ofVec3f(0,0,0), ofVec3f(0,0,1));
+                    break;
             }
+        }
+        if(v_Camera[i].getAutoMove()){
+            ofVec3f ballPos;
+            ballPos = modelBall.getPos();
+            v_Camera[i].lookAt(ballPos+ofVec3f(0, 0,0), ofVec3f(0,0,1));
         }
     }
     
@@ -965,13 +987,13 @@ void ofApp::keyPressed(int key){
             break;
         case '[':
             modelBall.clearHistory();
-            modelBall.setPos(ofVec3f(0,-COURT_HEIGHT_HALF,GROUND_LEVEL),ofVec3f(0,0,0));
-            modelBall.throwTo(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT+200),12);
+            modelBall.setPos(ofVec3f(-COURT_WIDTH_HALF/2,0,GROUND_LEVEL),ofVec3f(0,0,0));
+            modelBall.throwTo(ofVec3f(4.96,COURT_HEIGHT_HALF,GOAL_HEIGHT+128.8),8.3665);
             break;
         case ']':
             modelBall.clearHistory();
-            modelBall.setPos(ofVec3f(0,-COURT_HEIGHT_HALF,GROUND_LEVEL),ofVec3f(0,0,0));
-            modelBall.throwTo(ofVec3f(-GOAL_LOOP_RADIUS,COURT_HEIGHT_HALF,GOAL_HEIGHT+300),13);
+            modelBall.setPos(ofVec3f(0,-COURT_HEIGHT_HALF+40,GROUND_LEVEL+10),ofVec3f(2,2,0));
+            modelBall.throwTo(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT+99),10.4);
             break;
         case OF_KEY_UP:
             i_NowScheduleId = MAX(0,i_NowScheduleId-1);
@@ -1032,6 +1054,7 @@ void ofApp::keyPressed(int key){
             i_Camera = (i_Camera +1)%(v_Camera.size()-1);
             for(int i = 0;i<v_Camera.size();i++){
                 if(i_Camera == i){
+                //if(false){
                     v_Camera[i].enableMouseInput();
                 }else{
                     v_Camera[i].disableMouseInput();

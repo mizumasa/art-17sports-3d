@@ -149,6 +149,9 @@ public:
     ofxFloatSlider pf_Buf4;
     ofxFloatSlider pf_Buf5;
     ofxFloatSlider pf_Buf6;
+    ofxFloatSlider pf_Buf7;
+    ofxFloatSlider pf_Buf8;
+    ofxFloatSlider pf_Buf9;
 
     ofxAssimpModelLoader model;
     ofImage imgCourt;
