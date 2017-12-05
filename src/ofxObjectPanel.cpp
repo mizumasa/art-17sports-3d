@@ -146,6 +146,7 @@ void ofxObjectPanel::draw(){
     ofPushStyle();
     ofSetColor(255, 255, 255);
     //ofTranslate(vf_Pos);
+    ofScale(ofGetWidth()/1280.0, ofGetHeight()/800.0);
     ofTranslate(nowPos+vf_Pos);
     ofTranslate(tCenter - t1);
     ofRotateX(vf_Rotate[0]);

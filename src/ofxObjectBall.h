@@ -40,11 +40,12 @@ public:
     void startReverse();
     void clearHistory();
     bool isReversePlaying();
+    ofVec3f vf_Speed;
+    bool b_Slow;
 
 private:
     ofxAssimpModelLoader model;
     ofVec3f vf_Gravity;
-    ofVec3f vf_Speed;
     ofVec3f vf_RotateSpeed;
     ofVec3f vf_Pos;
     ofVec3f vf_Rotate;

@@ -11,12 +11,14 @@ ofxObjectBall::ofxObjectBall(){
     b_GoalLoop = false;
     t_Count = 0;
     b_NoResistance = false;
+    b_Slow = false;
 }
 
 //--------------------------------------------------------------
 void ofxObjectBall::update(){
     t_Count += 1;
     
+    //if(!b_Pose and !(b_Slow and (t_Count %2 == 0)) ){
     if(!b_Pose){
         vf_Speed += vf_Gravity;
         if(!b_NoResistance)vf_Speed -= vf_Speed/80.0;
@@ -197,11 +199,19 @@ void ofxObjectBall::draw(){
     ofPushMatrix();
     ofPushStyle();
     ofSetColor(255, 255, 255);
-    ofTranslate(vf_Pos);
-    ofScale(0.02,0.02,0.02);
-    ofRotateX(vf_Rotate[0]);
-    ofRotateY(vf_Rotate[1]);
-    ofRotateZ(vf_Rotate[2]);
+    if(false and b_Slow and (t_Count %2 == 0)){
+        ofTranslate(vf_Pos+vf_Speed/2.0);
+        ofScale(0.02,0.02,0.02);
+        ofRotateX(vf_Rotate[0]+vf_RotateSpeed[0]/2.0);
+        ofRotateY(vf_Rotate[1]+vf_RotateSpeed[1]/2.0);
+        ofRotateZ(vf_Rotate[2]+vf_RotateSpeed[2]/2.0);
+    }else{
+        ofTranslate(vf_Pos);
+        ofScale(0.02,0.02,0.02);
+        ofRotateX(vf_Rotate[0]);
+        ofRotateY(vf_Rotate[1]);
+        ofRotateZ(vf_Rotate[2]);
+    }
     ofNoFill();
     //ofDrawSphere(0, 0, 0, 240);
     ofTranslate(ofVec3f(0,250,0));

@@ -345,7 +345,8 @@ void ofApp::setup(){
     modelBall.setPos(ofVec3f(100,-100,0),ofVec3f(0,0,0));
     modelGameBall.noGravity();
     modelGameBall.setNoResistance();
-    
+    modelGameBall.b_Slow = true;
+
     i_BigSightMaskMode = 0;
     
     i_PanelScore = 0;
@@ -501,8 +502,9 @@ void ofApp::update(){
     }
     i_SceneIDPre = i_SceneID;
 
-    if(b_GuiDraw and (modelGameBall.t_Count%30==0)){
+    if(b_GuiDraw and (modelGameBall.t_Count%60==0)){
         cout <<"{"<< modelGameBall.getPos() <<"},"<< endl;
+        cout <<"speed"<< modelGameBall.vf_Speed << endl;
     }
 }
 
@@ -530,7 +532,7 @@ void ofApp::update3D(){
                     break;
                 case 2:
                     ballPos = modelGameBall.getPos();
-                    v_Camera[i].setPosition(ballPos+ofVec3f(0, -50,-14));
+                    v_Camera[i].setPosition(ballPos+ofVec3f(0, -50,-10));
                     v_Camera[i].lookAt(ballPos+ofVec3f(0,0,0), ofVec3f(0,0,1));
                     break;
                 default://3
@@ -982,8 +984,9 @@ void ofApp::keyPressed(int key){
             break;
         case 'y':
             //modelBall.setSpeed(ofVec3f(0,0,5));
+            modelGameBall.setGravity(2/1000.0);
             modelGameBall.setPos(ofVec3f(0,-COURT_HEIGHT_HALF+40,GROUND_LEVEL+10),ofVec3f(2,2,0));
-            modelGameBall.throwTo(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT),0.5);
+            modelGameBall.throwTo(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT+99),89/100.0);
             break;
         case '[':
             modelBall.clearHistory();
