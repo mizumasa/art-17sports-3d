@@ -29,12 +29,19 @@ ofxObjectRings::ofxObjectRings(){
 }
 
 //--------------------------------------------------------------
-void ofxObjectRings::update(){
+void ofxObjectRings::init(){
     for(int i=0;i<vf_Object.size();i++){
-        vf_Object[i].update();
-        if(vf_Object[i].isEnd()){
+        vf_Object[i].b_Finished = false;
+    }
+}
+
+//--------------------------------------------------------------
+void ofxObjectRings::update(float ballPosY){
+    for(int i=0;i<vf_Object.size();i++){
+        vf_Object[i].update(ballPosY);
+        /*if(vf_Object[i].isEnd()){
             vf_Object.erase(vf_Object.begin() + i);
-        }
+        }*/
     }
 }
 
@@ -67,8 +74,11 @@ ofxObjectRing::ofxObjectRing(ofVec3f _vf_Pos){
 }
 
 //--------------------------------------------------------------
-void ofxObjectRing::update(){
+void ofxObjectRing::update(float ballPosY){
     i_Count += 1;
+    if(vf_Pos[1]<ballPosY){
+        b_Finished = true;
+    }
     /*if(i_Count > 30){
         b_Finished = true;
     }*/
@@ -88,20 +98,22 @@ void ofxObjectRing::setRotate(float _angle){
 
 //--------------------------------------------------------------
 void ofxObjectRing::draw(){
-    ofPushMatrix();
-    ofPushStyle();
-    ofSetColor(255, 255, 255, 190);
-    ofSetCircleResolution(200);
-    ofSetLineWidth(6.0);
-    ofTranslate(vf_Pos);
-    ofNoFill();
-    ofRotateX(90+ 180 * f_angle / PI);
-    ofDrawCircle(0,0,0,10);
-    /*ofDrawCircle(0,0,0,i_Count);
-    if(i_Count>10){
-        ofDrawCircle(0,0,0,i_Count-10);
-    }*/
-    ofPopStyle();
-    ofPopMatrix();
+    if(!b_Finished){
+        ofPushMatrix();
+        ofPushStyle();
+        ofSetColor(255, 255, 255, 190);
+        ofSetCircleResolution(200);
+        ofSetLineWidth(6.0);
+        ofTranslate(vf_Pos);
+        ofNoFill();
+        ofRotateX(90+ 180 * f_angle / PI);
+        ofDrawCircle(0,0,0,10);
+        /*ofDrawCircle(0,0,0,i_Count);
+         if(i_Count>10){
+         ofDrawCircle(0,0,0,i_Count-10);
+         }*/
+        ofPopStyle();
+        ofPopMatrix();
+    }
 }
 

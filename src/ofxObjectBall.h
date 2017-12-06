@@ -42,6 +42,7 @@ public:
     bool isReversePlaying();
     ofVec3f vf_Speed;
     bool b_Slow;
+    ofVec3f vf_SlowShift;
 
 private:
     ofxAssimpModelLoader model;

@@ -8,10 +8,13 @@ ofxObjectBall::ofxObjectBall(){
     vf_RotateSpeed = ofVec3f(2, 14, 0);
     vf_Rotate = ofVec3f(0, 0, 0);
     vf_Gravity = ofVec3f(0, 0, -0.2);
+    
+    vf_SlowShift = ofVec3f(0, 0, 0);
     b_GoalLoop = false;
     t_Count = 0;
     b_NoResistance = false;
     b_Slow = false;
+    
 }
 
 //--------------------------------------------------------------
@@ -206,7 +209,7 @@ void ofxObjectBall::draw(){
         ofRotateY(vf_Rotate[1]+vf_RotateSpeed[1]/2.0);
         ofRotateZ(vf_Rotate[2]+vf_RotateSpeed[2]/2.0);
     }else{
-        ofTranslate(vf_Pos);
+        ofTranslate(vf_Pos + vf_SlowShift);
         ofScale(0.02,0.02,0.02);
         ofRotateX(vf_Rotate[0]);
         ofRotateY(vf_Rotate[1]);

@@ -13,23 +13,24 @@ class ofxObjectRing{
 public:
     ofxObjectRing(ofVec3f _vf_pos);
     void draw();
-    void update();
+    void update(float ballPosY);
     void setSpeed();
+    bool b_Finished;
     bool isEnd();
     void setRotate(float _angle);
 
 private:
     ofVec3f vf_Pos;
     int i_Count;
-    bool b_Finished;
     float f_angle;
 };
 
 class ofxObjectRings{
 public:
     ofxObjectRings();
+    void init();
     void draw();
-    void update();
+    void update(float ballPosY);
     void add(ofVec3f _vf_pos);
 private:
     vector<ofxObjectRing> vf_Object;

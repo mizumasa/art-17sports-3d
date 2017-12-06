@@ -533,7 +533,7 @@ void ofApp::update3D(){
                 case 2:
                     ballPos = modelGameBall.getPos();
                     v_Camera[i].setPosition(ballPos+ofVec3f(0, -50,-10));
-                    v_Camera[i].lookAt(ballPos+ofVec3f(0,0,0), ofVec3f(0,0,1));
+                    v_Camera[i].lookAt(ballPos + modelGameBall.vf_SlowShift+ofVec3f(0,0,0), ofVec3f(0,0,1));
                     break;
                 default://3
                     ballPos = modelBall.getPos();
@@ -562,7 +562,7 @@ void ofApp::update3D(){
     }
     modelGoalBall.update();
     objectEffect.update();
-    objectRing.update();
+    objectRing.update(modelGameBall.getPos()[1]);
     //ballParticle.addMouse();
     if(b_BallColor and !modelBall.isReversePlaying() and !modelGoalBall.isReversePlaying()){
         ballParticle.addPoint(modelBall.getPos());
@@ -987,6 +987,7 @@ void ofApp::keyPressed(int key){
             modelGameBall.setGravity(2/1000.0);
             modelGameBall.setPos(ofVec3f(0,-COURT_HEIGHT_HALF+40,GROUND_LEVEL+10),ofVec3f(2,2,0));
             modelGameBall.throwTo(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT+99),89/100.0);
+            objectRing.init();
             break;
         case '[':
             modelBall.clearHistory();
@@ -1001,6 +1002,7 @@ void ofApp::keyPressed(int key){
         case OF_KEY_UP:
             i_NowScheduleId = MAX(0,i_NowScheduleId-1);
             scheduleChange();
+            modelGameBall.vf_SlowShift[2] += 0.1;
             break;
         case OF_KEY_DOWN:
             i_NowScheduleId = MIN(v_ScheduleSeg.size()-1,i_NowScheduleId+1);
@@ -1008,10 +1010,13 @@ void ofApp::keyPressed(int key){
             for(int i = 0; i<v_ObjectPanel.size(); i++){
                 v_ObjectPanel[i].start();
             }
+            modelGameBall.vf_SlowShift[2] -= 0.1;
             break;
         case OF_KEY_LEFT:
+            modelGameBall.vf_SlowShift[0] -= 0.1;
             break;
         case OF_KEY_RIGHT:
+            modelGameBall.vf_SlowShift[0] += 0.1;
             break;
             
         case '1':
