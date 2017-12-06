@@ -502,9 +502,8 @@ void ofApp::update(){
     }
     i_SceneIDPre = i_SceneID;
 
-    if(b_GuiDraw and (modelGameBall.t_Count%60==0)){
-        cout <<"{"<< modelGameBall.getPos() <<"},"<< endl;
-        cout <<"speed"<< modelGameBall.vf_Speed << endl;
+    if(b_GuiDraw and (modelGameBall.t_Count%125==0)){
+        cout <<"{"<< modelGameBall.getPos() <<","<< modelGameBall.vf_Speed <<"},"<< endl;
     }
 }
 
@@ -984,9 +983,11 @@ void ofApp::keyPressed(int key){
             break;
         case 'y':
             //modelBall.setSpeed(ofVec3f(0,0,5));
-            modelGameBall.setGravity(2/1000.0);
+            //modelGameBall.setGravity(2/1000.0);
+            modelGameBall.setGravity(7/10000.0);
             modelGameBall.setPos(ofVec3f(0,-COURT_HEIGHT_HALF+40,GROUND_LEVEL+10),ofVec3f(2,2,0));
-            modelGameBall.throwTo(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT+99),89/100.0);
+            //modelGameBall.throwTo(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT+99),89/100.0);
+            modelGameBall.throwTo(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT+66*2),50/100.0);
             objectRing.init();
             break;
         case '[':
