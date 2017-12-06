@@ -11,6 +11,8 @@
 
 #define FLY_TIME 30
 
+#define MACBOOKPRO_W 1280.0
+#define MACBOOKPRO_H 800.0
 
 
 class ofxObjectPanel{
@@ -59,7 +61,8 @@ private:
     bool b_Left;
     ofVec2f startPos, t1, t2, t3;
     ofVec2f tCenter;
-    ofVec2f nowPos;    
+    ofVec2f nowPos;
+    ofVec3f color;
 };
 
 #endif

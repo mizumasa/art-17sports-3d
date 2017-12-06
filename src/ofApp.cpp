@@ -286,7 +286,7 @@ void ofApp::setup(){
     
     //model.loadModel("020512_stadium.stl");
     model.loadModel("020512_stadium.3DS");
-    imgCourt.load("groundc.jpg");
+    imgCourt.load("groundc1.png");
     
     //FboBlur
     ofFbo::Settings s;
@@ -793,9 +793,9 @@ void ofApp::draw3D(){
             ofTranslate(0, 0,GROUND_LEVEL);
             ofRotateZ(180);
             imgCourt.draw(-COURT_WIDTH_HALF, -COURT_HEIGHT_HALF, COURT_WIDTH_HALF*2, 2*COURT_HEIGHT_HALF);
-            ofSetColor(255, 255, 255, 200);
-            ofTranslate(0, 0, 1);
-            camImg.draw(-COURT_WIDTH_HALF, -COURT_HEIGHT_HALF, COURT_WIDTH_HALF*2, 2*COURT_HEIGHT_HALF);
+            //ofSetColor(255, 255, 255, 200);
+            //ofTranslate(0, 0, 1);
+            //camImg.draw(-COURT_WIDTH_HALF, -COURT_HEIGHT_HALF, COURT_WIDTH_HALF*2, 2*COURT_HEIGHT_HALF);
             ofPopMatrix();
         }
     }
@@ -905,8 +905,8 @@ void ofApp::draw3D(){
         ofSetColor(int((i*30)%256), int((i*50)%256), int((i*40)%256));
         ofDrawTriangle(right_pos[i][0][0],right_pos[i][0][1],right_pos[i][1][0],right_pos[i][1][1],right_pos[i][2][0],right_pos[i][2][1]);
     }*/
-    testLight.disable();
-    areaLight.enable();
+    testLight.enable();
+    areaLight.disable();
     for(int i = 0; i<v_ObjectPanel.size(); i++){
         v_ObjectPanel[i].draw();
     }

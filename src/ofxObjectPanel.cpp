@@ -52,6 +52,7 @@ void ofxObjectPanel::setStartPos(ofVec2f _startPos,ofVec2f _t1,ofVec2f _t2,ofVec
     t2 = _t2;
     t3 = _t3;
     tCenter = (t1+t2+t3)/3;
+    color = ofVec3f(116,6,22) * tCenter[1] / MACBOOKPRO_H + ofVec3f(240,160,185) * (MACBOOKPRO_H - tCenter[1]) / MACBOOKPRO_H;
 }
 
 void ofxObjectPanel::noGravity(){
@@ -144,9 +145,10 @@ bool ofxObjectPanel::isReversePlaying(){
 void ofxObjectPanel::draw(){
     ofPushMatrix();
     ofPushStyle();
-    ofSetColor(255, 255, 255);
+    ofSetColor(int(color[0]), int(color[1]), int(color[2]));
+    
     //ofTranslate(vf_Pos);
-    ofScale(ofGetWidth()/1280.0, ofGetHeight()/800.0);
+    ofScale(ofGetWidth()/MACBOOKPRO_W, ofGetHeight()/MACBOOKPRO_H);
     ofTranslate(nowPos+vf_Pos);
     ofTranslate(tCenter - t1);
     ofRotateX(vf_Rotate[0]);
