@@ -333,7 +333,6 @@ void ofApp::setup(){
     receiver.setup(PORT);
     
     ballParticle.setup();
-
     
     //Gritch
     lenna.loadImage("lenna.png");
@@ -1149,6 +1148,7 @@ void ofApp::mousePressed(int x, int y, int button){
     }
     cout << "pos:" << x << ":" << y << endl;
     
+
     ofxObjectPanel bufPanel;
     int i_Offset1,i_Offset2;
     i_Offset1 =  - ofGetWidth()*i_WindowMode;

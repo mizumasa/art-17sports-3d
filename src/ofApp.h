@@ -8,6 +8,7 @@
 #include "ofxObjectGoal.h"
 #include "ofxObjectBall.h"
 #include "ofxObjectPanel.h"
+#include "ofxObjectPanel2.h"
 #include "ofxObjectEffect.h"
 #include "ofxObjectRing.h"
 #include "ofxGui.h"

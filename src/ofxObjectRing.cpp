@@ -43,6 +43,7 @@ ofxObjectRings::ofxObjectRings(){
         add(ofVec3f(ring_path[i][0],ring_path[i][1],ring_path[i][2]));
         vf_Object[vf_Object.size()-1].setRotate(atan2(ring_path[i][4], ring_path[i][3]));
     }
+    i_ParticleUseIdx = 0;
 }
 
 //--------------------------------------------------------------
@@ -55,11 +56,15 @@ void ofxObjectRings::init(){
 //--------------------------------------------------------------
 void ofxObjectRings::update(float ballPosY){
     for(int i=0;i<vf_Object.size();i++){
-        vf_Object[i].update(ballPosY);
+        if(vf_Object[i].update(ballPosY)){
+            i_ParticleUseIdx = i;
+        }
         /*if(vf_Object[i].isEnd()){
             vf_Object.erase(vf_Object.begin() + i);
         }*/
     }
+    vf_Object[0].objectRingParticle.update();
+
 }
 
 
@@ -70,6 +75,11 @@ void ofxObjectRings::draw(){
     if(buf)ofDisableLighting();
     ofGetLightingEnabled();
     for(int i=0;i<vf_Object.size();i++){
+        if( i == i_ParticleUseIdx){
+            vf_Object[i].b_DrawParticle = true;
+        }else{
+            vf_Object[i].b_DrawParticle = false;
+        }
         vf_Object[i].draw();
     }
     if(buf)ofEnableLighting();
@@ -88,17 +98,27 @@ ofxObjectRing::ofxObjectRing(ofVec3f _vf_Pos){
     vf_Pos = _vf_Pos;
     b_Finished = false;
     i_Count = 0;
+    objectRingParticle.setup();
+    b_DrawParticle = false;
+
 }
 
 //--------------------------------------------------------------
-void ofxObjectRing::update(float ballPosY){
+bool ofxObjectRing::update(float ballPosY){
+    bool ret = false;
     i_Count += 1;
-    if(vf_Pos[1]<ballPosY){
+    if(vf_Pos[1]<ballPosY and (b_Finished == false)){
         b_Finished = true;
+        ret = true;
+        for(int i=0;i<100;i++){
+            objectRingParticle.addPoint(ofVec3f(10*sin(i),10*cos(i),0));
+        }
     }
+
     /*if(i_Count > 30){
         b_Finished = true;
     }*/
+    return ret;
 }
 
 void ofxObjectRing::setSpeed(){
@@ -115,22 +135,32 @@ void ofxObjectRing::setRotate(float _angle){
 
 //--------------------------------------------------------------
 void ofxObjectRing::draw(){
+    ofPushMatrix();
+    ofPushStyle();
+    ofSetColor(255, 255, 255, 190);
+    ofSetCircleResolution(200);
+    ofSetLineWidth(6.0);
+    ofTranslate(vf_Pos);
+    ofNoFill();
+    ofRotateX(90+ 180 * f_angle / PI);
     if(!b_Finished){
-        ofPushMatrix();
-        ofPushStyle();
-        ofSetColor(255, 255, 255, 190);
-        ofSetCircleResolution(200);
-        ofSetLineWidth(6.0);
-        ofTranslate(vf_Pos);
-        ofNoFill();
-        ofRotateX(90+ 180 * f_angle / PI);
         ofDrawCircle(0,0,0,10);
-        /*ofDrawCircle(0,0,0,i_Count);
-         if(i_Count>10){
-         ofDrawCircle(0,0,0,i_Count-10);
-         }*/
-        ofPopStyle();
-        ofPopMatrix();
+    }else{
+        if(b_DrawParticle){
+            ofPushStyle();
+            ofPushMatrix();
+            ofDisableDepthTest();
+            objectRingParticle.draw();
+            ofEnableDepthTest();
+            ofPopMatrix();
+            ofPopStyle();
+        }
     }
+    /*ofDrawCircle(0,0,0,i_Count);
+     if(i_Count>10){
+     ofDrawCircle(0,0,0,i_Count-10);
+     }*/
+    ofPopStyle();
+    ofPopMatrix();
 }
 

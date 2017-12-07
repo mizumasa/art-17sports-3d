@@ -8,16 +8,19 @@
 
 #include "ofMain.h"
 #include "common.h"
+#include "ofxObjectParticle.h"
 
 class ofxObjectRing{
 public:
     ofxObjectRing(ofVec3f _vf_pos);
     void draw();
-    void update(float ballPosY);
+    bool update(float ballPosY);
     void setSpeed();
     bool b_Finished;
     bool isEnd();
     void setRotate(float _angle);
+    ofxObjectRingParticle objectRingParticle;
+    bool b_DrawParticle;
 
 private:
     ofVec3f vf_Pos;
@@ -33,6 +36,7 @@ public:
     void update(float ballPosY);
     void add(ofVec3f _vf_pos);
 private:
+    int i_ParticleUseIdx;
     vector<ofxObjectRing> vf_Object;
 };
 

@@ -18,6 +18,9 @@
 #define OPENPOSE_CAP_HEIGHT 720
 #define OPENPOSE_CAP_WIDTH 1280
 
+#define FLY_TIME 30
+
+
 enum ACT_MODE
 {
     ACT_MODE_MOVIE = 0,

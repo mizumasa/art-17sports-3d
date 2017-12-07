@@ -9,7 +9,6 @@
 #include "ofMain.h"
 #include "common.h"
 
-#define FLY_TIME 30
 
 #define MACBOOKPRO_W 1280.0
 #define MACBOOKPRO_H 800.0

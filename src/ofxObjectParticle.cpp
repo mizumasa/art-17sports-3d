@@ -1,10 +1,59 @@
 #include "ofxObjectParticle.h"
 
+ofxSPK::System sys2;
+ofxSPK::Group group2;
+ofImage sprite2;
+ofxSPK::Modifier rot2;
+
+//--------------------------------------------------------------
+void ofxObjectRingParticle::setup()
+{
+    ofDisableArbTex();
+    sprite2.loadImage("image.jpg");
+    ofEnableArbTex();
+    
+    sys2.setup();
+    
+    group2.setup(sys2);
+    group2.setColor(ofxSPK::RangeC(ofColor(255, 255), ofColor(255, 255)),
+                   ofxSPK::RangeC(ofColor(0, 0), ofColor(255, 0)));
+    
+    group2.setLifeTime(0.5, 2);
+    group2.setFriction(0.1);
+    group2.setSize(0, ofxSPK::RangeF(5, 20));
+    
+    group2.setGravity(ofVec3f(0, 0, 0));
+    group2.setMass(1.0, 2.0);
+    
+    group2.reserve(300);
+}
+
+//--------------------------------------------------------------
+void ofxObjectRingParticle::update()
+{
+    sys2.update();
+}
+
+void ofxObjectRingParticle::addPoint(ofVec3f _pos){
+    group2.emitRandom(2, _pos);
+}
+
+//--------------------------------------------------------------
+void ofxObjectRingParticle::draw()
+{
+    ofEnableAlphaBlending();
+    ofEnableBlendMode(OF_BLENDMODE_ADD);
+    sprite2.bind();
+    ofEnablePointSprites();
+    sys2.draw();
+    ofDisablePointSprites();
+    sprite2.unbind();
+}
+
+
 ofxSPK::System sys;
 ofxSPK::Group group;
-
 ofImage sprite;
-
 ofxSPK::Modifier rot;
 
 //--------------------------------------------------------------
