@@ -11,7 +11,15 @@ ofxObjectPanel2::ofxObjectPanel2(){
     t_Count = 0;
     b_Pose = true;
     b_Left = false;
+    b_End = false;
+    i_Size = 0;
+    color = ofVec3f(255,255,255);
 }
+//--------------------------------------------------------------
+bool ofxObjectPanel2::getEnd(){
+    return b_End;
+}
+
 //--------------------------------------------------------------
 void ofxObjectPanel2::setLeft(bool b_){
     b_Left = b_;
@@ -29,13 +37,22 @@ void ofxObjectPanel2::update(){
     t_Count += 1;
     if(t_Count > FLY_TIME){
         //b_Pose = true;
+        b_End = true;
     }else{
         if(b_Left){
-            //nowPos = ( startPos * (FLY_TIME - t_Count) + t1 * t_Count )/FLY_TIME +
-            //ofVec2f(0,-100)*sin(PI*t_Count/FLY_TIME);
+            if(t_Count < FLY_TIME/2.0){
+                i_Size = t_Count;
+                nowPos = startPos + ofVec2f(0,i_Size*10);
+            }else{
+                b_End = true;
+            }
         }else{
-            //nowPos = ( startPos * (FLY_TIME - t_Count) + t1 * t_Count )/FLY_TIME +
-            //ofVec2f(0,-100)*sin(PI*t_Count/FLY_TIME);
+            if(t_Count >= FLY_TIME/2.0){
+                i_Size = FLY_TIME - t_Count;
+                nowPos =  ofVec2f(ofGetWidth()/2.0,ofGetHeight()/2.0 - 30 + i_Size*10);
+            }else{
+                i_Size = 0;
+            }
         }
     }
     if(!b_Pose){
@@ -60,21 +77,54 @@ void ofxObjectPanel2::setGravity(float _gravity){
 
 //--------------------------------------------------------------
 void ofxObjectPanel2::draw(){
-    ofPushMatrix();
-    ofPushStyle();
-    ofSetColor(int(color[0]), int(color[1]), int(color[2]));
-    
-    //ofTranslate(vf_Pos);
-    //ofScale(ofGetWidth()/MACBOOKPRO_W, ofGetHeight()/MACBOOKPRO_H);
-    ofTranslate(nowPos+vf_Pos);
-    //ofTranslate(tCenter - t1);
-    ofRotateX(vf_Rotate[0]);
-    ofRotateY(vf_Rotate[1]);
-    ofRotateZ(vf_Rotate[2]);
-    //ofTranslate(t1 - tCenter);
-    ofFill();
-    //ofDrawTriangle( ofVec2f(0,0), t2-t1, t3-t1);
-    ofPopStyle();
-    ofPopMatrix();
+    if(!b_End){
+        ofPushMatrix();
+        ofPushStyle();
+        ofSetColor(int(color[0]), int(color[1]), int(color[2]));
+        //ofScale(ofGetWidth()/MACBOOKPRO_W, ofGetHeight()/MACBOOKPRO_H);
+        //ofTranslate(nowPos+vf_Pos);
+        //ofTranslate(tCenter - t1);
+        //ofRotateX(vf_Rotate[0]);
+        //ofRotateY(vf_Rotate[1]);
+        //ofRotateZ(vf_Rotate[2]);
+        //ofTranslate(t1 - tCenter);
+        ofFill();
+        ofDrawCircle(nowPos, i_Size*3);
+        //ofDrawTriangle( ofVec2f(0,0), t2-t1, t3-t1);
+        ofPopStyle();
+        ofPopMatrix();
+    }
 }
 
+
+
+ofxObjectPanels2::ofxObjectPanels2(){
+}
+
+void ofxObjectPanels2::add(ofVec2f _startPos,bool _left){
+    ofxObjectPanel2 bufPanel;
+    bufPanel.setStartPos(_startPos);
+    bufPanel.setLeft(_left);
+    v_Panel.push_back(bufPanel);
+}
+
+void ofxObjectPanels2::draw(){
+    for(int i=0;i<v_Panel.size();i++){
+        v_Panel[i].draw();
+    }
+}
+void ofxObjectPanels2::update(){
+    for(int i=0;i<v_Panel.size();i++){
+        v_Panel[i].update();
+    }
+}
+void ofxObjectPanels2::noGravity(){
+    for(int i=0;i<v_Panel.size();i++){
+        v_Panel[i].noGravity();
+    }
+}
+void ofxObjectPanels2::setGravity(float _gravity){
+    for(int i=0;i<v_Panel.size();i++){
+        v_Panel[i].setGravity(_gravity);
+    }
+}

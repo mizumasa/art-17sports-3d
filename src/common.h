@@ -20,6 +20,7 @@
 
 #define FLY_TIME 30
 
+//#define USE_DETECTION
 
 enum ACT_MODE
 {

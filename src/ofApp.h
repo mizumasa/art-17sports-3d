@@ -24,7 +24,8 @@
 #include "ofxAssimpModelLoader.h"
 #include "ofxObjectParticle.h"
 
-
+#include "ofDetection.h"
+#include "ofPerspective.h"
 
 #define USE_BLACKMAGIC 0
 //#define BLACKMAGIC_W 1920
@@ -204,8 +205,29 @@ public:
     ofSoundPlayer bgm;
     ofSoundPlayer buzzer;
     vector<ofxObjectPanel> v_ObjectPanel;
+    ofxObjectPanels2 objectPanel2;
     ofxObjectFrame objectFrame;
     int i_PanelScore;
+    
+    
+    //below cam
+    
+#ifdef USE_DETECTION
+
+#ifdef _USE_LIVE_VIDEO
+    ofVideoGrabber         vidGrabber;
+#else
+    ofVideoPlayer         movie;
+#endif
+    ofxCvColorImage         colorImg;
+    ofxCvGrayscaleImage     grayImage;
+    ofDetection detect;
+    ofPerspective perspective;
+    bool b_DrawImage;
+    
+#else
+#endif
+
 };
 
 

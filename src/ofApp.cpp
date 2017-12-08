@@ -14,8 +14,9 @@
  /
  y-
  */
+#define RIGHT_POS_NUM 80
 
-int right_pos[80][3][2]={{{128, 62}, {240, 62}, {188, 159}},
+int right_pos[RIGHT_POS_NUM][3][2]={{{128, 62}, {240, 62}, {188, 159}},
     {{240, 62}, {354, 62}, {301, 159}},
     {{354, 62}, {467, 62}, {413, 159}},
     {{467, 62}, {581, 62}, {525, 159}},
@@ -438,28 +439,33 @@ void ofApp::update(){
     while(receiver.hasWaitingMessages()){
         ofxOscMessage m;
         receiver.getNextMessage(&m);
-        if((i_SceneID == 1) and m.getAddress() == "/mouse/position"){
+        if(m.getAddress() == "/mouse/position"){
             int recX,recY,recScore;
             recX = int((unsigned char)(m.getArgAsChar(0)));
             recY = int((unsigned char)(m.getArgAsChar(1)));
             recScore = int((unsigned char)(m.getArgAsChar(2)));
             cout << recX << ":"<< recY << "=" << recScore << endl;
             if(recScore>50){
-                int addPosX,addPosY;
+                /*
+                 int addPosX,addPosY;
                 addPosX = 2 * COURT_WIDTH_HALF * (0.5 - recX / 255.0);
                 addPosY = 2 * COURT_HEIGHT_HALF * (recY / 255.0 - 0.5);
-                objectEffect.add(ofVec3f(addPosX,addPosY,GROUND_LEVEL+4));
+                objectEffect.add(ofVec3f(addPosX,addPosY,GROUND_LEVEL+4));*/
+                mousePressed(ofGetWidth()*recX / 255.0, ofGetHeight()*recY / 255.0,0);
             }
         }
-        if((i_SceneID == 1) and m.getAddress() == "/debug/position"){
+        if(m.getAddress() == "/debug/position"){
             int recX,recY;
             recX = int((unsigned char)(m.getArgAsChar(0)));
             recY = int((unsigned char)(m.getArgAsChar(1)));
             cout << "Debug Pos "<< recX << ":"<< recY << endl;
-            int addPosX,addPosY;
+            
+            /*int addPosX,addPosY;
             addPosX = 2 * COURT_WIDTH_HALF * (0.5 - recX / 255.0);
             addPosY = 2 * COURT_HEIGHT_HALF * (recY / 255.0 - 0.5);
             objectEffect.add(ofVec3f(addPosX,addPosY,GROUND_LEVEL+4));
+             */
+            mousePressed(ofGetWidth()*recX / 255.0, ofGetHeight()*recY / 255.0,0);
         }
         if(m.getAddress() == "/pose/start"){
             int recX;
@@ -470,16 +476,6 @@ void ofApp::update(){
             int recX;
             recX = m.getArgAsInt32(0);
             cout << m.getAddress() << recX << endl;
-        }
-        if((i_SceneID == 2) and m.getAddress() == "/pose/subset"){
-            cout << "OSC got subset" << endl;
-        }
-        if((i_SceneID == 2) and m.getAddress() == "/pose/candidate"){
-            cout << "OSC got candidate" << m.getArgAsInt32(0) <<":"<<m.getArgAsInt32(1) <<":"<<m.getArgAsInt32(2) <<":"<<m.getArgAsInt32(3) << endl;
-            int detPosX,detPosY;
-            detPosX = int(ofGetWidth() * (m.getArgAsInt32(0) / OPENPOSE_RESIZE_RATE) / OPENPOSE_CAP_WIDTH);
-            detPosY = int(ofGetHeight() * (m.getArgAsInt32(1) / OPENPOSE_RESIZE_RATE) / OPENPOSE_CAP_HEIGHT);
-            ballParticle.addPoint(detPosX,detPosY);
         }
     }
     switch(i_SceneID){
@@ -498,6 +494,12 @@ void ofApp::update(){
         default:
             break;
     }
+    for(int i = 0; i<v_ObjectPanel.size(); i++){
+        v_ObjectPanel[i].update();
+    }
+    objectPanel2.update();
+    objectFrame.update();
+    
     if(i_SceneIDPre != i_SceneID){
         ballParticle.setup();
     }
@@ -568,10 +570,8 @@ void ofApp::update3D(){
         ballParticle.addPoint(modelBall.getPos());
     }
     ballParticle.update();
-    for(int i = 0; i<v_ObjectPanel.size(); i++){
-        v_ObjectPanel[i].update();
-    }
-    objectFrame.update();
+
+    
 }
 
 
@@ -603,6 +603,17 @@ void ofApp::draw(){
         default:
             break;
     }
+    ofPushMatrix();
+    ofScale(ofGetWidth()/MACBOOKPRO_W, ofGetHeight()/MACBOOKPRO_H);
+    for(int i = 0; i<v_ObjectPanel.size(); i++){
+        v_ObjectPanel[i].draw();
+    }
+    objectPanel2.draw();
+    ofPopMatrix();
+    objectFrame.draw();
+    ofPopStyle();
+    ofPopMatrix();
+    
     ofEnableAlphaBlending();
     if(i_BigSightMaskMode==0)i_BigSightMask.draw(0,0,ofGetWidth(),ofGetHeight());
     if(i_BigSightMaskMode==1)i_BigSightMask2.draw(0,0,ofGetWidth(),ofGetHeight());
@@ -909,12 +920,8 @@ void ofApp::draw3D(){
     }*/
     testLight.enable();
     areaLight.disable();
-    for(int i = 0; i<v_ObjectPanel.size(); i++){
-        v_ObjectPanel[i].draw();
-    }
-    objectFrame.draw();
-    ofPopStyle();
-    ofPopMatrix();
+    
+
 
 }
 
@@ -1004,12 +1011,16 @@ void ofApp::keyPressed(int key){
             modelBall.throwTo(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT+99),10.4);
             break;
         case OF_KEY_UP:
-            i_NowScheduleId = MAX(0,i_NowScheduleId-1);
+            i_NowScheduleId = max(0,i_NowScheduleId-1);
             scheduleChange();
             modelGameBall.vf_SlowShift[2] += 0.1;
             break;
         case OF_KEY_DOWN:
-            i_NowScheduleId = MIN(v_ScheduleSeg.size()-1,i_NowScheduleId+1);
+            //i_NowScheduleId = MIN(v_ScheduleSeg.size()-1,i_NowScheduleId+1);
+            i_NowScheduleId = i_NowScheduleId+1;
+            if(i_NowScheduleId > v_ScheduleSeg.size()-1){
+                i_NowScheduleId = v_ScheduleSeg.size()-1;
+            }
             scheduleChange();
             for(int i = 0; i<v_ObjectPanel.size(); i++){
                 v_ObjectPanel[i].start();
@@ -1108,6 +1119,19 @@ void ofApp::keyPressed(int key){
     if (key == 'l') bDrawLenna ^= true;
     if (key == 'h') bShowHelp ^= true;
 
+    
+    
+#ifdef USE_DETECTION
+    //below cam
+    if(key == 'i') detect.toggleImage();
+    if(key == 'g') detect.bHideGui = !detect.bHideGui;
+    //if(key == 's') detect.saveParam();
+    //if(key == 'l') detect.loadParam();
+    //if(key == 'c') perspective.toggleImage();
+    if(key == 'd') b_DrawImage = !b_DrawImage;
+#else
+#endif
+    
 }
 
 //--------------------------------------------------------------
@@ -1143,7 +1167,13 @@ void ofApp::mouseDragged(int x, int y, int button){
     if(i_SceneID == 2){
         ballParticle.addPoint(x,y);
     }
+    
+#ifdef USE_DETECTION
+    if(b_DrawImage)perspective.mouseDragged(mouseX, mouseY, button);
+#endif
+    
 }
+
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
@@ -1152,22 +1182,45 @@ void ofApp::mousePressed(int x, int y, int button){
     }
     cout << "pos:" << x << ":" << y << endl;
     
+    switch(v_Camera[i_Camera].getChaseBall()){
+        case 2:
+        {
+            objectPanel2.add(ofVec2f(x,y), (i_WindowMode==0));
+        }
+            break;
+        default:
+        {
+            if(i_PanelScore >= RIGHT_POS_NUM){
+                i_PanelScore = 0;
+                v_ObjectPanel.clear();
+            }
+            ofxObjectPanel bufPanel;
+            int i_Offset1,i_Offset2;
+            i_Offset1 =  - ofGetWidth()*i_WindowMode;
+            i_Offset2 =  ofGetWidth()* (1 - i_WindowMode);
+            bufPanel.setStartPos(ofVec2f(i_Offset1 + x,y),
+                                 ofVec2f(i_Offset2 + right_pos[RIGHT_POS_NUM-1-i_PanelScore][0][0],right_pos[RIGHT_POS_NUM-1-i_PanelScore][0][1]),
+                                 ofVec2f(i_Offset2 + right_pos[RIGHT_POS_NUM-1-i_PanelScore][1][0],right_pos[RIGHT_POS_NUM-1-i_PanelScore][1][1]),
+                                 ofVec2f(i_Offset2 + right_pos[RIGHT_POS_NUM-1-i_PanelScore][2][0],right_pos[RIGHT_POS_NUM-1-i_PanelScore][2][1]));
+            i_PanelScore += 1;
+            v_ObjectPanel.push_back(bufPanel);
+        }
+            break;
+    }
+    
+    
 
-    ofxObjectPanel bufPanel;
-    int i_Offset1,i_Offset2;
-    i_Offset1 =  - ofGetWidth()*i_WindowMode;
-    i_Offset2 =  ofGetWidth()* (1 - i_WindowMode);
-    bufPanel.setStartPos(ofVec2f(i_Offset1 + x,y),
-                         ofVec2f(i_Offset2 + right_pos[i_PanelScore][0][0],right_pos[i_PanelScore][0][1]),
-                         ofVec2f(i_Offset2 + right_pos[i_PanelScore][1][0],right_pos[i_PanelScore][1][1]),
-                         ofVec2f(i_Offset2 + right_pos[i_PanelScore][2][0],right_pos[i_PanelScore][2][1]));
-    i_PanelScore += 1;
-    v_ObjectPanel.push_back(bufPanel);
+#ifdef USE_DETECTION
+    if(b_DrawImage)perspective.mousePressed(mouseX, mouseY, button);
+#endif
 }
 
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
 
+#ifdef USE_DETECTION
+    if(b_DrawImage)perspective.mouseReleased(mouseX, mouseY, button);
+#endif
 }
 
 //--------------------------------------------------------------
