@@ -2,10 +2,12 @@ ofxAVString
 ofxAssimpModelLoader
 ofxBlackmagic
 ofxBlur
+ofxCv
 ofxDelaunay
 ofxFboBlur
 ofxGui
 ofxJSON
+ofxOpenCv
 ofxOsc
 ofxPostGlitch
 ofxSPK

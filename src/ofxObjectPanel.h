@@ -64,4 +64,48 @@ private:
     ofVec3f color;
 };
 
+
+class ofxObjectPanelFrame{
+public:
+    ofxObjectPanelFrame();
+    void start();
+    void draw();
+    void update();
+    void noGravity();
+    void setPoint(ofVec2f _pos);
+    void setGravity(float _gravity);
+    uint64_t t_Count;
+    
+private:
+    ofVec3f vf_Gravity;
+    ofVec3f vf_Speed;
+    ofVec3f vf_RotateSpeed;
+    ofVec3f vf_Pos;
+    ofVec3f vf_Rotate;
+    bool b_Pose;
+    bool b_Left;
+    vector<ofVec2f> vf_Points;
+    ofVec2f tCenter;
+    ofVec2f nowPos;
+    ofVec3f color;
+};
+
+class ofxObjectFrame{
+public:
+    ofxObjectFrame();
+    void draw();
+    void update();
+    void noGravity();
+    void setGravity(float _gravity);
+    void setPoints();
+    uint64_t t_Count;
+    
+private:
+    bool b_Pose;
+    bool b_Left;
+    vector<ofxObjectPanelFrame> v_Frame;
+};
+
+
+
 #endif

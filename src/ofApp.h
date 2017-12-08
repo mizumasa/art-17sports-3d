@@ -204,6 +204,7 @@ public:
     ofSoundPlayer bgm;
     ofSoundPlayer buzzer;
     vector<ofxObjectPanel> v_ObjectPanel;
+    ofxObjectFrame objectFrame;
     int i_PanelScore;
 };
 
