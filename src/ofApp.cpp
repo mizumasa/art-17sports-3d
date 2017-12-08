@@ -349,6 +349,8 @@ void ofApp::setup(){
     i_BigSightMaskMode = 0;
     
     i_PanelScore = 0;
+    
+    objectFrame.setPoints();
 }
 
 //update--------------------------------------------------------------
@@ -569,6 +571,7 @@ void ofApp::update3D(){
     for(int i = 0; i<v_ObjectPanel.size(); i++){
         v_ObjectPanel[i].update();
     }
+    objectFrame.update();
 }
 
 
@@ -909,6 +912,7 @@ void ofApp::draw3D(){
     for(int i = 0; i<v_ObjectPanel.size(); i++){
         v_ObjectPanel[i].draw();
     }
+    objectFrame.draw();
     ofPopStyle();
     ofPopMatrix();
 
