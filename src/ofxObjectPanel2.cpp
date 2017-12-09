@@ -48,9 +48,9 @@ void ofxObjectPanel2::update(){
             }
         }else{
             if(t_Count >= FLY_TIME/2.0){
-                i_Size = FLY_TIME - t_Count;
+                i_Size = t_Count;
                 nowPos =  ofVec2f(ofGetWidth()/2.0 + endPos[0]*20,
-                                  ofGetHeight()/2.0 - 30  + endPos[1]*20+ i_Size*10);
+                                  ofGetHeight()/2.0 - 30  + endPos[1]*20+ (FLY_TIME - i_Size)*10);
             }else{
                 i_Size = 0;
             }

@@ -261,6 +261,7 @@ void ofApp::setup(){
         camBuf.setFarClip(20000);
         v_Camera.push_back(camBuf);
     }
+    b_CameraFix = true;
 
     
     for(int i = -MIR_X_NUM ;i<=MIR_X_NUM ;i++){
@@ -1064,7 +1065,7 @@ void ofApp::keyPressed(int key){
             modelGoalBall.clearPose();
             modelBall.clearPose();
             for(int i = 0;i<v_Camera.size();i++){
-                if(i_Camera == i){
+                if(i_Camera == i and !b_CameraFix){
                     v_Camera[i].enableMouseInput();
                 }else{
                     v_Camera[i].disableMouseInput();
@@ -1074,11 +1075,14 @@ void ofApp::keyPressed(int key){
         case 'm':
             i_BigSightMaskMode = (i_BigSightMaskMode+1)%3;
             break;
+        case 'C':
+            b_CameraFix = !b_CameraFix;
+            break;
         case 'c':
             //b_Camera = !b_Camera;
             i_Camera = (i_Camera +1)%(v_Camera.size()-1);
             for(int i = 0;i<v_Camera.size();i++){
-                if(i_Camera == i){
+                if(i_Camera == i and !b_CameraFix){
                 //if(false){
                     v_Camera[i].enableMouseInput();
                 }else{
@@ -1088,6 +1092,9 @@ void ofApp::keyPressed(int key){
             break;
         case 'b':
             b_BallColor = !b_BallColor;
+            break;
+        case 'B':
+            objectFrame.setBlink(true);
             break;
         case '@':
             modelGoalBall.releaseOut();
@@ -1156,6 +1163,8 @@ void ofApp::keyReleased(int key){
     if (key == 't') myGlitch.setFx(OFXPOSTGLITCH_CR_BLUEINVERT    , false);
     if (key == 'y') myGlitch.setFx(OFXPOSTGLITCH_CR_REDINVERT    , false);
     if (key == 'u') myGlitch.setFx(OFXPOSTGLITCH_CR_GREENINVERT    , false);
+
+    if (key == 'B') objectFrame.setBlink(false);
 
 }
 

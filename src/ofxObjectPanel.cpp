@@ -1,10 +1,15 @@
 #include "ofxObjectPanel.h"
 
-#define FRAME_NUM 16
+#define FRAME_NUM 25
 #define LEFT_FRAME_WIDTH 57
 #define RIGHT_FRAME_WIDTH 56
+#define FRAME_TOP_X 31
+#define FRAME_TOP_Y 50
 
-int frame_pos[FRAME_NUM][4][2]={{{128 - LEFT_FRAME_WIDTH, 62}, {128, 62}, {188, 159}, {188 - LEFT_FRAME_WIDTH, 159}},
+
+int frame_pos[FRAME_NUM][4][2]={
+    //{{128 - LEFT_FRAME_WIDTH, 62}, {128, 62}, {188, 159}, {188 - LEFT_FRAME_WIDTH, 159}},
+    {{128 - LEFT_FRAME_WIDTH, 62}, {95, 12}, {188, 159}, {188 - LEFT_FRAME_WIDTH, 159}},
     {{188 - LEFT_FRAME_WIDTH, 159}, {188, 159}, {249, 254}, {249 - LEFT_FRAME_WIDTH, 254}},
     {{249 - LEFT_FRAME_WIDTH, 254}, {249, 254}, {308, 347}, {308 - LEFT_FRAME_WIDTH, 347}},
     {{308 - LEFT_FRAME_WIDTH, 347}, {308, 347}, {366, 438}, {366 - LEFT_FRAME_WIDTH, 438}},
@@ -19,7 +24,18 @@ int frame_pos[FRAME_NUM][4][2]={{{128 - LEFT_FRAME_WIDTH, 62}, {128, 62}, {188, 
     {{910, 438}, {910 + RIGHT_FRAME_WIDTH, 438}, {968 + RIGHT_FRAME_WIDTH, 347}, {968, 347}},
     {{968, 347}, {968 + RIGHT_FRAME_WIDTH, 347}, {1027 + RIGHT_FRAME_WIDTH, 254}, {1027, 254}},
     {{1027, 254}, {1027 + RIGHT_FRAME_WIDTH, 254}, {1087 + RIGHT_FRAME_WIDTH, 159}, {1087, 159}},
-    {{1087, 159}, {1087 + RIGHT_FRAME_WIDTH, 159}, {1150 + RIGHT_FRAME_WIDTH, 62}, {1150, 62}}};
+    //{{1087, 159}, {1087 + RIGHT_FRAME_WIDTH, 159}, {1150 + RIGHT_FRAME_WIDTH, 62}, {1150, 62}}
+    {{1087, 159}, {1087 + RIGHT_FRAME_WIDTH, 159}, {1150 + RIGHT_FRAME_WIDTH, 62}, {1181, 12}},
+    {{128-FRAME_TOP_X, 62-FRAME_TOP_Y}, {240-FRAME_TOP_X, 62-FRAME_TOP_Y}, {240, 62}, {128, 62}},
+    {{240-FRAME_TOP_X, 62-FRAME_TOP_Y}, {354-FRAME_TOP_X, 62-FRAME_TOP_Y}, {354, 62}, {240, 62}},
+    {{354-FRAME_TOP_X, 62-FRAME_TOP_Y}, {467-FRAME_TOP_X, 62-FRAME_TOP_Y}, {467, 62}, {354, 62}},
+    {{467-FRAME_TOP_X, 62-FRAME_TOP_Y}, {581-FRAME_TOP_X, 62-FRAME_TOP_Y}, {581, 62}, {467, 62}},
+    {{581-FRAME_TOP_X, 62-FRAME_TOP_Y}, {694-FRAME_TOP_X, 62-FRAME_TOP_Y}, {694, 62}, {581, 62}},
+    {{694-FRAME_TOP_X, 62-FRAME_TOP_Y}, {809-FRAME_TOP_X, 62-FRAME_TOP_Y}, {809, 62}, {694, 62}},
+    {{809-FRAME_TOP_X, 62-FRAME_TOP_Y}, {922-FRAME_TOP_X, 62-FRAME_TOP_Y}, {922, 62}, {809, 62}},
+    {{922-FRAME_TOP_X, 62-FRAME_TOP_Y}, {1036-FRAME_TOP_X, 62-FRAME_TOP_Y}, {1036, 62}, {922, 62}},
+    {{1036-FRAME_TOP_X, 62-FRAME_TOP_Y}, {1150+FRAME_TOP_X, 62-FRAME_TOP_Y}, {1150, 62}, {1036, 62}}
+};
 //--------------------------------------------------------------
 ofxObjectPanel::ofxObjectPanel(){
     vf_Pos = ofVec3f(0, 0, 0);
@@ -175,13 +191,15 @@ void ofxObjectPanelFrame::draw(){
     //ofDrawTriangle( ofVec2f(0,0), t2-t1, t3-t1);
     ofDrawTriangle(vf_Points[0],vf_Points[1],vf_Points[2]);
     ofDrawTriangle(vf_Points[0],vf_Points[2],vf_Points[3]);
-    cout << vf_Points[0] << endl;
+    //cout << vf_Points[0] << endl;
     ofPopStyle();
     ofPopMatrix();
 }
 
 
 ofxObjectFrame::ofxObjectFrame(){
+    b_Blink = false;
+    t_Count = 0;
 }
 
 void ofxObjectFrame::setPoints(){
@@ -196,15 +214,24 @@ void ofxObjectFrame::setPoints(){
 }
 
 void ofxObjectFrame::draw(){
+    if(b_Blink and (t_Count%2==0)){
+        return;
+    }
     for(int i=0;i<v_Frame.size();i++){
         v_Frame[i].draw();
     }
 }
 void ofxObjectFrame::update(){
+    t_Count += 1;
     for(int i=0;i<v_Frame.size();i++){
         v_Frame[i].update();
     }
 }
+
+void ofxObjectFrame::setBlink(bool _state){
+    b_Blink = _state;
+}
+
 void ofxObjectFrame::noGravity(){
     for(int i=0;i<v_Frame.size();i++){
         v_Frame[i].noGravity();

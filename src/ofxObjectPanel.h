@@ -98,11 +98,13 @@ public:
     void noGravity();
     void setGravity(float _gravity);
     void setPoints();
+    void setBlink(bool _state);
     uint64_t t_Count;
     
 private:
     bool b_Pose;
     bool b_Left;
+    bool b_Blink;
     vector<ofxObjectPanelFrame> v_Frame;
 };
 

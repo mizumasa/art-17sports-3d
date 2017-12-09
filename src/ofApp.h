@@ -140,6 +140,7 @@ public:
     bool b_Render;
     
     vector<ofxObjectCamera> v_Camera;
+    bool b_CameraFix;
     
     ofxFboBlur gpuBlur;
     
