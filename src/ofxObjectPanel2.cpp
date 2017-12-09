@@ -49,7 +49,8 @@ void ofxObjectPanel2::update(){
         }else{
             if(t_Count >= FLY_TIME/2.0){
                 i_Size = FLY_TIME - t_Count;
-                nowPos =  ofVec2f(ofGetWidth()/2.0,ofGetHeight()/2.0 - 30 + i_Size*10);
+                nowPos =  ofVec2f(ofGetWidth()/2.0 + endPos[0]*20,
+                                  ofGetHeight()/2.0 - 30  + endPos[1]*20+ i_Size*10);
             }else{
                 i_Size = 0;
             }
@@ -65,6 +66,10 @@ void ofxObjectPanel2::update(){
 
 void ofxObjectPanel2::setStartPos(ofVec2f _startPos){
     startPos = _startPos;
+}
+
+void ofxObjectPanel2::setEndPos(ofVec2f _endPos){
+    endPos = _endPos;
 }
 
 void ofxObjectPanel2::noGravity(){
@@ -101,9 +106,10 @@ void ofxObjectPanel2::draw(){
 ofxObjectPanels2::ofxObjectPanels2(){
 }
 
-void ofxObjectPanels2::add(ofVec2f _startPos,bool _left){
+void ofxObjectPanels2::add(ofVec2f _startPos, ofVec3f _ballShift ,bool _left){
     ofxObjectPanel2 bufPanel;
     bufPanel.setStartPos(_startPos);
+    bufPanel.setEndPos(ofVec2f(_ballShift[0], - _ballShift[2]));
     bufPanel.setLeft(_left);
     v_Panel.push_back(bufPanel);
 }

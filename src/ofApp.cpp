@@ -579,7 +579,8 @@ void ofApp::update3D(){
 //draw--------------------------------------------------------------
 void ofApp::draw(){
     
-     switch(i_WindowMode){
+    ofPushStyle();
+    switch(i_WindowMode){
         case 0:
             drawLeft();
             break;
@@ -603,14 +604,15 @@ void ofApp::draw(){
         default:
             break;
     }
+    ofPopStyle();
     ofPushMatrix();
     ofScale(ofGetWidth()/MACBOOKPRO_W, ofGetHeight()/MACBOOKPRO_H);
     for(int i = 0; i<v_ObjectPanel.size(); i++){
         v_ObjectPanel[i].draw();
     }
-    objectPanel2.draw();
-    ofPopMatrix();
     objectFrame.draw();
+    ofPopMatrix();
+    objectPanel2.draw();
     ofPopStyle();
     ofPopMatrix();
     
@@ -1185,7 +1187,7 @@ void ofApp::mousePressed(int x, int y, int button){
     switch(v_Camera[i_Camera].getChaseBall()){
         case 2:
         {
-            objectPanel2.add(ofVec2f(x,y), (i_WindowMode==0));
+            objectPanel2.add(ofVec2f(x,y),modelGameBall.vf_SlowShift, (i_WindowMode==0));
         }
             break;
         default:

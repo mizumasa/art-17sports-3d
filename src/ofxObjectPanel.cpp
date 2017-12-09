@@ -165,7 +165,6 @@ void ofxObjectPanelFrame::draw(){
     ofPushStyle();
     ofSetColor(int(color[0]), int(color[1]), int(color[2]));
     
-    ofScale(ofGetWidth()/MACBOOKPRO_W, ofGetHeight()/MACBOOKPRO_H);
     ofTranslate(nowPos+vf_Pos);
     //ofTranslate(tCenter - t1);
     ofRotateX(vf_Rotate[0]);

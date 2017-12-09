@@ -19,6 +19,7 @@ public:
     void setLeft(bool b_);
     void noGravity();
     void setStartPos(ofVec2f _startPos);
+    void setEndPos(ofVec2f _endPos);
     void setGravity(float _gravity);
     bool getEnd();
     uint64_t t_Count;
@@ -35,6 +36,7 @@ private:
     bool b_Left;
     int i_Size;
     ofVec2f startPos;
+    ofVec2f endPos;
     ofVec2f nowPos;
     ofVec3f color;
 };
@@ -46,7 +48,7 @@ public:
     void update();
     void noGravity();
     void setGravity(float _gravity);
-    void add(ofVec2f _startPos,bool _left);
+    void add(ofVec2f _startPos,ofVec3f _ballShift ,bool _left);
     uint64_t t_Count;
     
 private:
