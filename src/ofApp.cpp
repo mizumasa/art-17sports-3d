@@ -317,8 +317,8 @@ void ofApp::setup(){
     gui.setPosition(0,ofGetHeight()/2);
     b_GuiDraw = false;
     
-    gpuBlur.blurOffset = 24;
-    gpuBlur.blurPasses = 9.5;
+    gpuBlur.blurOffset = 10;
+    gpuBlur.blurPasses = 2;
     gpuBlur.numBlurOverlays = 1;
     gpuBlur.blurOverlayGain = 255;
     
@@ -536,7 +536,7 @@ void ofApp::update3D(){
                 case 2:
                     ballPos = modelGameBall.getPos();
                     v_Camera[i].setPosition(ballPos+ofVec3f(0, -50,-10));
-                    v_Camera[i].lookAt(ballPos + modelGameBall.vf_SlowShift+ofVec3f(0,0,0), ofVec3f(0,0,1));
+                    v_Camera[i].lookAt(ballPos + ofVec3f(0,0,0), ofVec3f(0,0,1));
                     break;
                 default://3
                     ballPos = modelBall.getPos();
@@ -660,6 +660,7 @@ void ofApp::drawInput(){
         ofPopStyle();
     }
     
+#ifdef USE_FBO
     myFbo.begin();
     ofClear(0, 0, 0,255);
     if (!bDrawLenna){
@@ -693,6 +694,8 @@ void ofApp::drawInput(){
     /* draw effected view */
     ofSetColor(255);
     myFbo.draw(100, 100);
+#endif
+    
     
     
     /* show information*/
@@ -750,29 +753,6 @@ void ofApp::draw3D(){
     
     ofPushMatrix();
     {
-        //ofScale(1.0,1.0,1.0);
-        {
-            //testLight.disable();
-            //areaLight.disable();
-
-            ofPushStyle();
-            ofPushMatrix();
-            ofTranslate(4.5, 0,0);
-            ofRotateX(-90);
-            ofSetColor(0, 0, 0, 128);
-            //model.drawFaces();
-            ofPopMatrix();
-            ofPopStyle();
-
-            /*if(b_TestLight){
-                testLight.enable();
-                areaLight.disable();
-            }else{
-                testLight.disable();
-                areaLight.enable();
-            }*/
-
-        }
         {
             ofPushMatrix();
             //ofTranslate(0,0,pf_Buf5*pf_Buf6*pf_Buf2);
@@ -840,32 +820,10 @@ void ofApp::draw3D(){
 	if(!b_TestLight)areaLight.draw();
     if(b_TestLight)testLight.draw();
 
- 
-#if 0
-    for(int i=0;i<v_Camera.size();i++){
-        ofSetColor(255,0,0);
-        ofPushStyle();
-        ofPushMatrix();
-        ofDisableLighting();
-        ofMatrix4x4 inverseCameraMatrix;
-        inverseCameraMatrix.makeInvertOf(v_Camera[i].getModelViewProjectionMatrix());
-        ofMultMatrix( inverseCameraMatrix );
-        ofPoint scale2(0.9,0.9,0.9);
-        ofScale(scale2);
-        ofNoFill();
-        ofDrawBox(0, 0, 0, 2.0f);
-        ofEnableLighting();
-        ofPopMatrix();
-        ofPopStyle();
-    }
-#endif
-    
-
-    
     v_Camera[i_Camera].end();
-    
     ofPopStyle();
 
+    
     
     
     ofSetColor(255, 255, 255,255);//this color is applied to gpuBlur.beginDrawScene();
@@ -907,20 +865,13 @@ void ofApp::draw3D(){
     v_Camera[i_Camera].end();
     
     gpuBlur.endDrawScene();
+    
     gpuBlur.performBlur();
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA); //pre-multiplied alpha
+    
     gpuBlur.drawBlurFbo();
     
-    testLight.disable();
-    
-    ofPushMatrix();
-    ofPushStyle();
-    /*
-    for(int i = 0; i<80; i++){
-        //ofSetColor(int(ofRandom(0,255)), int(ofRandom(0,255)), int(ofRandom(0,255)));
-        ofSetColor(int((i*30)%256), int((i*50)%256), int((i*40)%256));
-        ofDrawTriangle(right_pos[i][0][0],right_pos[i][0][1],right_pos[i][1][0],right_pos[i][1][1],right_pos[i][2][0],right_pos[i][2][1]);
-    }*/
+
     testLight.enable();
     areaLight.disable();
     
@@ -1031,10 +982,10 @@ void ofApp::keyPressed(int key){
             modelGameBall.vf_SlowShift[2] -= 0.1;
             break;
         case OF_KEY_LEFT:
-            modelGameBall.vf_SlowShift[0] -= 0.1;
+            modelGameBall.vf_SlowShift[0] -= 0.4;
             break;
         case OF_KEY_RIGHT:
-            modelGameBall.vf_SlowShift[0] += 0.1;
+            modelGameBall.vf_SlowShift[0] += 0.4;
             break;
             
         case '1':
@@ -1057,11 +1008,13 @@ void ofApp::keyPressed(int key){
             i_test -= 1;
             break;
         case 'x':
+            /*
             if(i_Camera == (v_Camera.size()-1)){
                 changeToField();
             }else{
                 changeToGoal();
-            }
+            }*/
+            i_Camera = v_Camera.size()-2;
             modelGoalBall.clearPose();
             modelBall.clearPose();
             for(int i = 0;i<v_Camera.size();i++){
@@ -1080,7 +1033,7 @@ void ofApp::keyPressed(int key){
             break;
         case 'c':
             //b_Camera = !b_Camera;
-            i_Camera = (i_Camera +1)%(v_Camera.size()-1);
+            i_Camera = (i_Camera +1)%(v_Camera.size()-2);
             for(int i = 0;i<v_Camera.size();i++){
                 if(i_Camera == i and !b_CameraFix){
                 //if(false){
