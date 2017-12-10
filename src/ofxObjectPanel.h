@@ -34,6 +34,7 @@ public:
     //void startGoalLoopSlow();
     void setGravity(float _gravity);
     uint64_t t_Count;
+    int i_ColorMode;
 
     //void togglePose();
     //void clearPose();
@@ -75,6 +76,7 @@ public:
     void setPoint(ofVec2f _pos);
     void setGravity(float _gravity);
     uint64_t t_Count;
+    int i_ColorMode;
     
 private:
     ofVec3f vf_Gravity;
@@ -100,6 +102,7 @@ public:
     void setPoints();
     void setBlink(bool _state);
     uint64_t t_Count;
+    int i_ColorMode;
     
 private:
     bool b_Pose;

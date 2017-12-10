@@ -499,7 +499,9 @@ void ofApp::update(){
         v_ObjectPanel[i].update();
     }
     objectPanel2.update();
+    objectFrame.i_ColorMode = i_NowScheduleId % 2;
     objectFrame.update();
+    objectCountdown.update();
     
     if(i_SceneIDPre != i_SceneID){
         ballParticle.setup();
@@ -607,11 +609,13 @@ void ofApp::draw(){
     }
     ofPopStyle();
     ofPushMatrix();
+    ofDisableLighting();
     ofScale(ofGetWidth()/MACBOOKPRO_W, ofGetHeight()/MACBOOKPRO_H);
     for(int i = 0; i<v_ObjectPanel.size(); i++){
         v_ObjectPanel[i].draw();
     }
     objectFrame.draw();
+    objectCountdown.draw();
     ofPopMatrix();
     objectPanel2.draw();
     ofPopStyle();
@@ -994,6 +998,15 @@ void ofApp::keyPressed(int key){
         case '2':
             i_SceneID = 2;
             break;
+        case '3':
+            objectCountdown.start(0);
+            break;
+        case '4':
+            objectCountdown.start(1);
+            break;
+        case '5':
+            objectCountdown.start(2);
+            break;
         /*case '3':
             i_SceneID = 3;
             break;
@@ -1162,10 +1175,12 @@ void ofApp::mousePressed(int x, int y, int button){
             int i_Offset1,i_Offset2;
             i_Offset1 =  - ofGetWidth()*i_WindowMode;
             i_Offset2 =  ofGetWidth()* (1 - i_WindowMode);
+            bufPanel.i_ColorMode = i_NowScheduleId % 2;
             bufPanel.setStartPos(ofVec2f(i_Offset1 + x,y),
                                  ofVec2f(i_Offset2 + right_pos[RIGHT_POS_NUM-1-i_PanelScore][0][0],right_pos[RIGHT_POS_NUM-1-i_PanelScore][0][1]),
                                  ofVec2f(i_Offset2 + right_pos[RIGHT_POS_NUM-1-i_PanelScore][1][0],right_pos[RIGHT_POS_NUM-1-i_PanelScore][1][1]),
                                  ofVec2f(i_Offset2 + right_pos[RIGHT_POS_NUM-1-i_PanelScore][2][0],right_pos[RIGHT_POS_NUM-1-i_PanelScore][2][1]));
+            
             i_PanelScore += 1;
             v_ObjectPanel.push_back(bufPanel);
         }

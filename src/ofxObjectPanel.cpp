@@ -1,11 +1,22 @@
 #include "ofxObjectPanel.h"
 
 #define FRAME_NUM 25
-#define LEFT_FRAME_WIDTH 57
-#define RIGHT_FRAME_WIDTH 56
+//#define LEFT_FRAME_WIDTH 57
+//#define RIGHT_FRAME_WIDTH 56
+#define LEFT_FRAME_WIDTH 72
+#define RIGHT_FRAME_WIDTH 71
 #define FRAME_TOP_X 31
 #define FRAME_TOP_Y 50
 
+int frameColorMode[2][3]={
+    {45,255,254},
+    {252,36,224}
+};
+
+int colorMode[2][2][3]={
+    {{183,38,251},{250,39,244}},
+    {{254,222,50},{209,251,53}}
+};
 
 int frame_pos[FRAME_NUM][4][2]={
     //{{128 - LEFT_FRAME_WIDTH, 62}, {128, 62}, {188, 159}, {188 - LEFT_FRAME_WIDTH, 159}},
@@ -47,6 +58,7 @@ ofxObjectPanel::ofxObjectPanel(){
     t_Count = 0;
     b_Pose = true;
     b_Left = false;
+    i_ColorMode = 0;
 }
 //--------------------------------------------------------------
 void ofxObjectPanel::setLeft(bool b_){
@@ -88,7 +100,13 @@ void ofxObjectPanel::setStartPos(ofVec2f _startPos,ofVec2f _t1,ofVec2f _t2,ofVec
     t2 = _t2;
     t3 = _t3;
     tCenter = (t1+t2+t3)/3;
-    color = ofVec3f(116,6,22) * tCenter[1] / MACBOOKPRO_H + ofVec3f(240,160,185) * (MACBOOKPRO_H - tCenter[1]) / MACBOOKPRO_H;
+    color = ofVec3f(ofClamp(colorMode[i_ColorMode][0][0] + ofRandom(-10,10),0,255),
+                    ofClamp(colorMode[i_ColorMode][0][1] + ofRandom(-10,10),0,255),
+                    ofClamp(colorMode[i_ColorMode][0][2] + ofRandom(-10,10),0,255))
+    * tCenter[1] / MACBOOKPRO_H +
+    ofVec3f(ofClamp(colorMode[i_ColorMode][1][0] + ofRandom(-10,10),0,255),
+            ofClamp(colorMode[i_ColorMode][1][1] + ofRandom(-10,10),0,255),
+            ofClamp(colorMode[i_ColorMode][1][2] + ofRandom(-10,10),0,255)) * (MACBOOKPRO_H - tCenter[1]) / MACBOOKPRO_H;
 }
 
 void ofxObjectPanel::noGravity(){
@@ -179,7 +197,12 @@ void ofxObjectPanelFrame::setGravity(float _gravity){
 void ofxObjectPanelFrame::draw(){
     ofPushMatrix();
     ofPushStyle();
-    ofSetColor(int(color[0]), int(color[1]), int(color[2]));
+    //ofSetColor(int(color[0]), int(color[1]), int(color[2]));
+    ofSetColor(
+               frameColorMode[i_ColorMode][0],
+               frameColorMode[i_ColorMode][1],
+               frameColorMode[i_ColorMode][2]
+    );
     
     ofTranslate(nowPos+vf_Pos);
     //ofTranslate(tCenter - t1);
@@ -224,6 +247,7 @@ void ofxObjectFrame::draw(){
 void ofxObjectFrame::update(){
     t_Count += 1;
     for(int i=0;i<v_Frame.size();i++){
+        v_Frame[i].i_ColorMode = i_ColorMode;
         v_Frame[i].update();
     }
 }

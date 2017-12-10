@@ -100,7 +100,7 @@ ofxObjectRing::ofxObjectRing(ofVec3f _vf_Pos){
     i_Count = 0;
     objectRingParticle.setup();
     b_DrawParticle = false;
-
+    imgRing.load("PathRing.png");
 }
 
 //--------------------------------------------------------------
@@ -144,7 +144,10 @@ void ofxObjectRing::draw(){
     ofNoFill();
     ofRotateX(90+ 180 * f_angle / PI);
     if(!b_Finished){
-        ofDrawCircle(0,0,0,10);
+        //ofDrawCircle(0,0,0,10);
+        //ofDisableDepthTest();
+        imgRing.draw(-13, -13, 26, 26);
+        //ofEnableDepthTest();
     }else{
         if(b_DrawParticle){
             ofPushStyle();

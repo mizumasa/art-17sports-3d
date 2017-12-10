@@ -9,6 +9,7 @@
 #include "ofxObjectBall.h"
 #include "ofxObjectPanel.h"
 #include "ofxObjectPanel2.h"
+#include "ofxObjectCountdown.h"
 #include "ofxObjectEffect.h"
 #include "ofxObjectRing.h"
 #include "ofxGui.h"
@@ -208,6 +209,7 @@ public:
     vector<ofxObjectPanel> v_ObjectPanel;
     ofxObjectPanels2 objectPanel2;
     ofxObjectFrame objectFrame;
+    ofxObjectCountdowns objectCountdown;
     int i_PanelScore;
     
     

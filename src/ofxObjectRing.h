@@ -26,6 +26,7 @@ private:
     ofVec3f vf_Pos;
     int i_Count;
     float f_angle;
+    ofImage imgRing;
 };
 
 class ofxObjectRings{

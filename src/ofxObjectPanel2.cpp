@@ -1,5 +1,18 @@
 #include "ofxObjectPanel2.h"
 
+int panelColoe2[10][3]={
+    {246 ,   253 ,   118},
+    {193 ,   253   , 117},
+    {166,    253  ,  116},
+    {254  ,  230 ,   117},
+    {254  ,  203  ,  115},
+    { 253 ,   142  ,  152},
+    { 253  ,  100 ,   180},
+    { 252  ,  64  ,  219},
+    {253   , 97  ,  163},
+    {254   , 230  ,  241}
+};
+
 //--------------------------------------------------------------
 ofxObjectPanel2::ofxObjectPanel2(){
     vf_Pos = ofVec3f(0, 0, 0);
@@ -39,22 +52,6 @@ void ofxObjectPanel2::update(){
         //b_Pose = true;
         b_End = true;
     }else{
-        if(b_Left){
-            if(t_Count < FLY_TIME/2.0){
-                i_Size = t_Count;
-                nowPos = startPos + ofVec2f(0,i_Size*10);
-            }else{
-                b_End = true;
-            }
-        }else{
-            if(t_Count >= FLY_TIME/2.0){
-                i_Size = t_Count;
-                nowPos =  ofVec2f(ofGetWidth()/2.0 + endPos[0]*20,
-                                  ofGetHeight()/2.0 - 30  + endPos[1]*20+ (FLY_TIME - i_Size)*10);
-            }else{
-                i_Size = 0;
-            }
-        }
     }
     if(!b_Pose){
         vf_Speed += vf_Gravity;
@@ -93,8 +90,43 @@ void ofxObjectPanel2::draw(){
         //ofRotateY(vf_Rotate[1]);
         //ofRotateZ(vf_Rotate[2]);
         //ofTranslate(t1 - tCenter);
-        ofFill();
-        ofDrawCircle(nowPos, i_Size*3);
+        if(b_Left){
+            if(t_Count < FLY_TIME/2.0){
+                i_Size = t_Count;
+                nowPos = startPos + ofVec2f(0,i_Size*10);
+            }else{
+                b_End = true;
+            }
+            ofFill();
+            ofDrawCircle(nowPos, i_Size*3);
+        }else{
+            if(t_Count >= FLY_TIME/2.0){
+                int i_time;
+                i_time = int(t_Count - FLY_TIME/2.0);
+                i_Size = t_Count;
+                nowPos =  ofVec2f(ofGetWidth()/2.0 + endPos[0]*20,
+                                  ofGetHeight()/2.0 - 30 );
+                ofNoFill();
+                ofPushStyle();
+                ofSetLineWidth(3.0);
+                for(int i=0 ; i<= i_time; i++){
+                    ofPushMatrix();
+                    if((i_time - i)%2 == 0){
+                        ofTranslate(nowPos + ofVec2f(0, - i*8));
+                        ofSetColor(panelColoe2[int((i_time-i)/2)][0],
+                                   panelColoe2[int((i_time-i)/2)][1],
+                                   panelColoe2[int((i_time-i)/2)][2]);
+                        ofDrawTriangle(-50, 70, 0, 0, 50, 70);
+                    }
+                    ofPopMatrix();
+                }
+                ofPopStyle();
+            }else{
+                i_Size = 0;
+            }
+        }
+
+        
         //ofDrawTriangle( ofVec2f(0,0), t2-t1, t3-t1);
         ofPopStyle();
         ofPopMatrix();
