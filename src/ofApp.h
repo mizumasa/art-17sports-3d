@@ -28,13 +28,13 @@
 #include "ofDetection.h"
 #include "ofPerspective.h"
 
-#define USE_BLACKMAGIC 0
-//#define BLACKMAGIC_W 1920
-//#define BLACKMAGIC_H 1080
-//#define BLACKMAGIC_FPS 30
-#define BLACKMAGIC_W 1280
-#define BLACKMAGIC_H 720
-#define BLACKMAGIC_FPS 60
+#define USE_BLACKMAGIC 1
+#define BLACKMAGIC_W 1920
+#define BLACKMAGIC_H 1080
+#define BLACKMAGIC_FPS 30
+//#define BLACKMAGIC_W 1280
+//#define BLACKMAGIC_H 720
+//#define BLACKMAGIC_FPS 60
 #define WEBCAM_W 1280
 #define WEBCAM_H 720
 #define CAPTURE_W 1280
