@@ -104,7 +104,7 @@ void ofxObjectPanel2::draw(){
                 int i_time;
                 i_time = int(t_Count - FLY_TIME/2.0);
                 i_Size = t_Count;
-                nowPos =  ofVec2f(ofGetWidth()/2.0 + endPos[0]*20,
+                nowPos =  ofVec2f(ofGetWidth()/2.0 + endPos[0]*40,
                                   ofGetHeight()/2.0 - 30 );
                 ofNoFill();
                 ofPushStyle();
