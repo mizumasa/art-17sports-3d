@@ -1376,17 +1376,24 @@ void ofApp::keyPressed(int key){
             objectFrame.setBlink(true);
             break;
         case '@':
+        {
             ofxOscMessage m;
             m.setAddress("/between/scene");
             m.addIntArg(0);
             sendBetweenLR.sendMessage(m);
             //modelGoalBall.releaseOut();
             break;
+        }
         case ':':
+        
+        {
             modelGoalBall.releaseGoal();
+        }
             break;
         case '_':
+        {
             modelGoalBall.startGoalLoopSlow();
+        }
             break;
 	}
     if (key == '-') myGlitch.setFx(OFXPOSTGLITCH_CONVERGENCE    , true);
