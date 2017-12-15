@@ -132,6 +132,8 @@ void ofApp::setup(){
     buzzer.setLoop(false);
 
     i_NowScheduleId = 0;
+    i_NextScheduleId = 0;
+
     b_ScheduleStart = false;
     b_SchedulePlaying = false;
     
@@ -359,6 +361,8 @@ void ofApp::setup(){
     i_PanelScore = 0;
     
     objectFrame.setPoints();
+    
+    i_PanelColorMode = 0;
 }
 
 //update--------------------------------------------------------------
@@ -412,6 +416,38 @@ void ofApp::update(){
         if(i_NowScheduleId==(v_ScheduleSeg.size()-2)){
             //buzzer.play();
         }
+
+        if(v_ScheduleSeg[i_NowScheduleId].s_Name=="power gauge1" or v_ScheduleSeg[i_NowScheduleId].s_Name=="audience1" ){
+            i_PanelColorMode = 0;
+            v_ObjectPanel.clear();
+            i_PanelScore = 0;
+        }
+        if(v_ScheduleSeg[i_NowScheduleId].s_Name=="power gauge2" or v_ScheduleSeg[i_NowScheduleId].s_Name=="audience2" ){
+            i_PanelColorMode = 1;
+            v_ObjectPanel.clear();
+            i_PanelScore = 0;
+        }
+        if(v_ScheduleSeg[i_NowScheduleId].s_Name=="fly game"){
+            cout<< "fly game "<< endl;
+            i_Camera = v_Camera.size()-2;
+            modelGoalBall.clearPose();
+            modelBall.clearPose();
+            for(int i = 0;i<v_Camera.size();i++){
+                if(i_Camera == i and !b_CameraFix){
+                    v_Camera[i].enableMouseInput();
+                }else{
+                    v_Camera[i].disableMouseInput();
+                }
+            }
+            modelGameBall.setGravity(7/10000.0);
+            modelGameBall.setPos(ofVec3f(0,-COURT_HEIGHT_HALF+40,GROUND_LEVEL+10),ofVec3f(2,2,0));
+            //modelGameBall.throwTo(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT+99),89/100.0);
+            modelGameBall.throwTo(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT+66*2),50/100.0);
+            objectRing.init();
+
+        }
+
+        
         switch(v_ScheduleSeg[i_NowScheduleId].actMode){
             case ACT_MODE_CG:
                 i_SceneID = 1;
@@ -441,6 +477,7 @@ void ofApp::update(){
             default:
                 break;
         }
+        /*
         if(v_ScheduleSeg[i_NowScheduleId].s_Name=="CG2fail"){
             cout << "CG 2 fail"<<endl;
             changeToGoal();
@@ -448,7 +485,7 @@ void ofApp::update(){
         if(v_ScheduleSeg[i_NowScheduleId].s_Name=="CG 2 success"){
             cout << "CG 2 success"<<endl;
             changeToGoal();
-        }
+        }*/
     }
     if(b_SchedulePlaying){
         v_ScheduleSeg[i_NowScheduleId].video.update();
@@ -516,7 +553,7 @@ void ofApp::update(){
         v_ObjectPanel[i].update();
     }
     objectPanel2.update();
-    objectFrame.i_ColorMode = i_NowScheduleId % 2;
+    objectFrame.i_ColorMode = i_PanelColorMode;
     objectFrame.update();
     objectCountdown.update();
     
@@ -661,7 +698,7 @@ void ofApp::draw(){
         string info = "";
         info += "Framerate:"+ofToString(ofGetFrameRate())+"\n";
         info += "window size :"+ofToString(ofGetWidth())+"x"+ofToString(ofGetHeight())+"\n";
-        info += ofToString(v_ScheduleSeg[i_NowScheduleId].s_Name)+"\n";
+        info += ofToString(v_ScheduleSeg[i_NextScheduleId].s_Name)+"\n";
         info += " ";
         ofSetColor(255,255,255);
         ofDrawBitmapString(info, 20,gui.getPosition().y + gui.getHeight()+50);
@@ -911,7 +948,7 @@ void ofApp::draw3D(){
 
 
 void ofApp::changeToField(){
-    i_Camera = 0;
+    //i_Camera = 0;
     modelBall.clearHistory();
 }
 void ofApp::changeToGoal(){
@@ -927,6 +964,8 @@ void ofApp::changeToGoal(){
 void ofApp::keyPressed(int key){
 	switch(key){
         case ' ':
+            i_NowScheduleId = i_NextScheduleId;
+            scheduleChange();
             b_ScheduleStart = true;
             cout << i_NowScheduleId << " start"<<endl;
             break;
@@ -1022,17 +1061,15 @@ void ofApp::keyPressed(int key){
             modelBall.throwTo(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT+99),10.4);
             break;
         case OF_KEY_UP:
-            i_NowScheduleId = max(0,i_NowScheduleId-1);
-            scheduleChange();
+            i_NextScheduleId = max(0,i_NextScheduleId-1);
             modelGameBall.vf_SlowShift[2] += 0.1;
             break;
         case OF_KEY_DOWN:
             //i_NowScheduleId = MIN(v_ScheduleSeg.size()-1,i_NowScheduleId+1);
-            i_NowScheduleId = i_NowScheduleId+1;
-            if(i_NowScheduleId > v_ScheduleSeg.size()-1){
-                i_NowScheduleId = v_ScheduleSeg.size()-1;
+            i_NextScheduleId = i_NextScheduleId+1;
+            if(i_NextScheduleId > v_ScheduleSeg.size()-1){
+                i_NextScheduleId = v_ScheduleSeg.size()-1;
             }
-            scheduleChange();
             for(int i = 0; i<v_ObjectPanel.size(); i++){
                 v_ObjectPanel[i].start();
             }
@@ -1232,7 +1269,7 @@ void ofApp::mousePressed(int x, int y, int button){
             int i_Offset1,i_Offset2;
             i_Offset1 =  - ofGetWidth()*i_WindowMode;
             i_Offset2 =  ofGetWidth()* (1 - i_WindowMode);
-            bufPanel.i_ColorMode = i_NowScheduleId % 2;
+            bufPanel.i_ColorMode = i_PanelColorMode;
             bufPanel.setStartPos(ofVec2f(i_Offset1 + x,y),
                                  ofVec2f(i_Offset2 + right_pos[RIGHT_POS_NUM-1-i_PanelScore][0][0],right_pos[RIGHT_POS_NUM-1-i_PanelScore][0][1]),
                                  ofVec2f(i_Offset2 + right_pos[RIGHT_POS_NUM-1-i_PanelScore][1][0],right_pos[RIGHT_POS_NUM-1-i_PanelScore][1][1]),

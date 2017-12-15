@@ -200,6 +200,7 @@ public:
     //vector<ofVideoPlayer> v_Player;
     vector<ofxScheduleSeg> v_ScheduleSeg;
     int i_NowScheduleId;
+    int i_NextScheduleId;
     bool b_ScheduleStart;
     bool b_SchedulePlaying;
     ofImage i_BigSightMask;
@@ -216,6 +217,8 @@ public:
     ofxObjectFrame objectFrame;
     ofxObjectCountdowns objectCountdown;
     int i_PanelScore;
+    
+    int i_PanelColorMode;
     
     //below cam
     
