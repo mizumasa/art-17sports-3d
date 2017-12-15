@@ -589,6 +589,12 @@ void ofApp::update(){
                 i_NowScheduleId = i_NextScheduleId;
                 scheduleChange();
                 b_ScheduleStart = true;
+                {
+                    ofxOscMessage m;
+                    m.setAddress("/between/scene");
+                    m.addIntArg(i_NowScheduleId);
+                    sendBetweenLR.sendMessage(m);
+                }
                 cout << i_NowScheduleId << " start"<<endl;
                 b_Continue = false;
             }
@@ -602,6 +608,12 @@ void ofApp::update(){
                     i_NowScheduleId = i_NextScheduleId;
                     scheduleChange();
                     b_ScheduleStart = true;
+                    {
+                        ofxOscMessage m;
+                        m.setAddress("/between/scene");
+                        m.addIntArg(i_NowScheduleId);
+                        sendBetweenLR.sendMessage(m);
+                    }
                     cout << i_NowScheduleId << " start"<<endl;
                     b_Continue = false;
                 }
@@ -616,6 +628,12 @@ void ofApp::update(){
                     i_NowScheduleId = i_NextScheduleId;
                     scheduleChange();
                     b_ScheduleStart = true;
+                    {
+                        ofxOscMessage m;
+                        m.setAddress("/between/scene");
+                        m.addIntArg(i_NowScheduleId);
+                        sendBetweenLR.sendMessage(m);
+                    }
                     cout << i_NowScheduleId << " start"<<endl;
                     b_Continue = false;
                 }
@@ -642,6 +660,12 @@ void ofApp::update(){
                     i_NowScheduleId = i_NextScheduleId;
                     scheduleChange();
                     b_ScheduleStart = true;
+                    {
+                        ofxOscMessage m;
+                        m.setAddress("/between/scene");
+                        m.addIntArg(i_NowScheduleId);
+                        sendBetweenLR.sendMessage(m);
+                    }
                     cout << i_NowScheduleId << " start"<<endl;
                     b_Continue = false;
                 }
@@ -653,10 +677,16 @@ void ofApp::update(){
                 if(! v_ScheduleSeg[i_NowScheduleId].video.isPlaying()){
                     i_NextScheduleId = i_NowScheduleId + 1;
                     if(i_NextScheduleId < v_ScheduleSeg.size()){
-                    i_NowScheduleId = i_NextScheduleId;
-                    scheduleChange();
-                    b_ScheduleStart = true;
-                    cout << i_NowScheduleId << " start"<<endl;
+                        i_NowScheduleId = i_NextScheduleId;
+                        scheduleChange();
+                        b_ScheduleStart = true;
+                        {
+                            ofxOscMessage m;
+                            m.setAddress("/between/scene");
+                            m.addIntArg(i_NowScheduleId);
+                            sendBetweenLR.sendMessage(m);
+                        }
+                        cout << i_NowScheduleId << " start"<<endl;
                     }else{
                         b_AutomatorOn = false;
                     }
@@ -674,6 +704,12 @@ void ofApp::update(){
         recvBetweenLR.getNextMessage(&m);
         if(m.getAddress() == "/between/scene"){
             cout << "scene change got:"<< m.getArgAsInt(0) <<endl;
+            if(b_AutomatorOn){
+                i_NowScheduleId = m.getArgAsInt(0);
+                i_NextScheduleId = i_NowScheduleId;
+                scheduleChange();
+                b_ScheduleStart = true;
+            }
             ofxOscMessage m2;
             m2.setAddress("/between/got");
             sendBetweenLR.sendMessage(m2);
