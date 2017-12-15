@@ -11,7 +11,10 @@
 
 void ofApp::setupRight(){
     s_RightIP = XML.getValue<string>("//RIGHTIP");
+    s_LeftIP = XML.getValue<string>("//LeftIP");
     cout << "right mode:" << s_RightIP << endl;
+    sendBetweenLR.setup(s_LeftIP, BETWEEN_LR_PORT);
+
     i_BigSightMask.load(XML.getValue<string>("//RIGHTMASK"));
     i_BigSightMask2.load(XML.getValue<string>("//RIGHTMASK2"));
 

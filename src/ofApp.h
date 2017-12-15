@@ -200,7 +200,8 @@ public:
     int i_WindowMode;
     int i_GameMode;
     string s_RightIP;
-    
+    string s_LeftIP;
+
     //vector<ofVideoPlayer> v_Player;
     vector<ofxScheduleSeg> v_ScheduleSeg;
     int i_NowScheduleId;

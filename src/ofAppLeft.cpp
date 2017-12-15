@@ -10,6 +10,11 @@
 #include "ofApp.h"
 
 void ofApp::setupLeft(){
+    s_RightIP = XML.getValue<string>("//RIGHTIP");
+    s_LEFTIP = XML.getValue<string>("//LEFTIP");
+    cout << "left mode:" << s_LEFTIP << endl;
+    sendBetweenLR.setup(s_RightIP, BETWEEN_LR_PORT);
+
     i_BigSightMask.load(XML.getValue<string>("//LEFTMASK"));
     i_BigSightMask2.load(XML.getValue<string>("//LEFTMASK2"));
     if(XML.exists("LEFTVIDEO"))

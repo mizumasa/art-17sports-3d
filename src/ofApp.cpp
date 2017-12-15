@@ -342,6 +342,7 @@ void ofApp::setup(){
     modelGoalBall.noGravity();
     modelGoalBall.setGoalLoop();
     receiver.setup(PORT);
+    recvBetweenLR.setup(BETWEEN_LR_PORT);
     
     ballParticle.setup();
     
@@ -668,6 +669,19 @@ void ofApp::update(){
         v_ScheduleSeg[i_NowScheduleId].video.update();
     }
     
+    while(recvBetweenLR.hasWaitingMessages()){
+        ofxOscMessage m;
+        recvBetweenLR.getNextMessage(&m);
+        if(m.getAddress() == "/between/scene"){
+            cout << "scene change got:"<< m.getArgAsInt(0) <<endl;
+            ofxOscMessage m;
+            m.setAddress("/between/got");
+            sendBetweenLR.sendMessage(m);
+        }
+        if(m.getAddress() == "/between/got"){
+            cout << "Between OSC got" << endl;
+        }
+    }
     while(receiver.hasWaitingMessages()){
         ofxOscMessage m;
         receiver.getNextMessage(&m);
@@ -1362,7 +1376,11 @@ void ofApp::keyPressed(int key){
             objectFrame.setBlink(true);
             break;
         case '@':
-            modelGoalBall.releaseOut();
+            ofxOscMessage m;
+            m.setAddress("/between/scene");
+            m.addIntArg(0);
+            sendBetweenLR.sendMessage(m);
+            //modelGoalBall.releaseOut();
             break;
         case ':':
             modelGoalBall.releaseGoal();
