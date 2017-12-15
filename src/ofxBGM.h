@@ -3,8 +3,8 @@
  */
 #pragma once
 
-#ifndef __ofxObjectBGM__
-#define __ofxObjectBGM__
+#ifndef __ofxBGM__
+#define __ofxBGM__
 
 #include "ofMain.h"
 #include "common.h"

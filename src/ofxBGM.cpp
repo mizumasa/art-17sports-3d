@@ -1,4 +1,4 @@
-#include "ofxObjectBGM.h"
+#include "ofxBGM.h"
 
 #define FO_TIME 60
 #define DOWN_TIME 10

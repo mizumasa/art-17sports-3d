@@ -12,7 +12,7 @@
 #include "ofxObjectCountdown.h"
 #include "ofxObjectEffect.h"
 #include "ofxObjectRing.h"
-#include "ofxObjectBGM.h"
+#include "ofxBGM.h"
 #include "ofxGui.h"
 #include "ofxBlackMagic.h"
 #include "common.h"
