@@ -592,7 +592,11 @@ void ofApp::update(){
                 {
                     ofxOscMessage m;
                     m.setAddress("/between/scene");
-                    m.addIntArg(i_NowScheduleId);
+                    if( i_NowScheduleId > 2){
+                        m.addIntArg(i_NowScheduleId - 1);
+                    }else{
+                        m.addIntArg(i_NowScheduleId);
+                    }
                     sendBetweenLR.sendMessage(m);
                 }
                 cout << i_NowScheduleId << " start"<<endl;
@@ -611,7 +615,11 @@ void ofApp::update(){
                     {
                         ofxOscMessage m;
                         m.setAddress("/between/scene");
-                        m.addIntArg(i_NowScheduleId);
+                        if( i_NowScheduleId > 2){
+                            m.addIntArg(i_NowScheduleId - 1);
+                        }else{
+                            m.addIntArg(i_NowScheduleId);
+                        }
                         sendBetweenLR.sendMessage(m);
                     }
                     cout << i_NowScheduleId << " start"<<endl;
@@ -631,7 +639,11 @@ void ofApp::update(){
                     {
                         ofxOscMessage m;
                         m.setAddress("/between/scene");
-                        m.addIntArg(i_NowScheduleId);
+                        if( i_NowScheduleId > 2){
+                            m.addIntArg(i_NowScheduleId - 1);
+                        }else{
+                            m.addIntArg(i_NowScheduleId);
+                        }
                         sendBetweenLR.sendMessage(m);
                     }
                     cout << i_NowScheduleId << " start"<<endl;
@@ -643,16 +655,12 @@ void ofApp::update(){
             if(i_AutoNextFlyingGameBall > 0){
                 i_AutoNextFlyingGameBall ++;
                 if(i_AutoNextFlyingGameBall == 633){
-                    /*右側にアングル変更の指示送る
-                     i_Camera = (i_Camera +1)%(v_Camera.size()-2);
-                    for(int i = 0;i<v_Camera.size();i++){
-                        if(i_Camera == i and !b_CameraFix){
-                            //if(false){
-                            v_Camera[i].enableMouseInput();
-                        }else{
-                            v_Camera[i].disableMouseInput();
-                        }
-                     }*/
+                    {
+                        ofxOscMessage m;
+                        m.setAddress("/between/camera");
+                        sendBetweenLR.sendMessage(m);
+                    }
+                    //右側にアングル変更の指示送る
                 }
                 if(i_AutoNextFlyingGameBall > 654){
                     i_AutoNextFlyingGameBall = 0;
@@ -663,7 +671,11 @@ void ofApp::update(){
                     {
                         ofxOscMessage m;
                         m.setAddress("/between/scene");
-                        m.addIntArg(i_NowScheduleId);
+                        if( i_NowScheduleId > 2){
+                            m.addIntArg(i_NowScheduleId - 1);
+                        }else{
+                            m.addIntArg(i_NowScheduleId);
+                        }
                         sendBetweenLR.sendMessage(m);
                     }
                     cout << i_NowScheduleId << " start"<<endl;
@@ -717,6 +729,17 @@ void ofApp::update(){
             ofxOscMessage m2;
             m2.setAddress("/between/got");
             sendBetweenLR.sendMessage(m2);
+        }
+        if(m.getAddress() == "/between/camera"){
+            i_Camera = (i_Camera +1)%(v_Camera.size()-2);
+            for(int i = 0;i<v_Camera.size();i++){
+                if(i_Camera == i and !b_CameraFix){
+                    //if(false){
+                    v_Camera[i].enableMouseInput();
+                }else{
+                    v_Camera[i].disableMouseInput();
+                }
+            }
         }
         if(m.getAddress() == "/between/got"){
             cout << "Between OSC got" << endl;
