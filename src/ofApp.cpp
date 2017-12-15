@@ -417,15 +417,24 @@ void ofApp::update(){
             //buzzer.play();
         }
 
+        modelBall.clearPose();
         if(v_ScheduleSeg[i_NowScheduleId].s_Name=="power gauge1" or v_ScheduleSeg[i_NowScheduleId].s_Name=="audience1" ){
+            i_Camera = 3;
             i_PanelColorMode = 0;
             v_ObjectPanel.clear();
             i_PanelScore = 0;
+            modelBall.clearHistory();
+            modelBall.setPos(ofVec3f(-COURT_WIDTH_HALF/2,0,GROUND_LEVEL+10),ofVec3f(0,0,0));
+            modelBall.setPose();
         }
         if(v_ScheduleSeg[i_NowScheduleId].s_Name=="power gauge2" or v_ScheduleSeg[i_NowScheduleId].s_Name=="audience2" ){
+            i_Camera = 3;
             i_PanelColorMode = 1;
             v_ObjectPanel.clear();
             i_PanelScore = 0;
+            modelBall.clearHistory();
+            modelBall.setPos(ofVec3f(0,-COURT_HEIGHT_HALF+40,GROUND_LEVEL+10),ofVec3f(2,2,0));
+            modelBall.setPose();
         }
         if(v_ScheduleSeg[i_NowScheduleId].s_Name=="fly game"){
             cout<< "fly game "<< endl;
@@ -444,7 +453,42 @@ void ofApp::update(){
             //modelGameBall.throwTo(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT+99),89/100.0);
             modelGameBall.throwTo(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT+66*2),50/100.0);
             objectRing.init();
+        }
+        if(v_ScheduleSeg[i_NowScheduleId].s_Name=="fly cg fail right" or v_ScheduleSeg[i_NowScheduleId].s_Name=="fly cg fail left"){
+            if(i_WindowMode == 0){
+                i_Camera = 0;
+            }else{
+                i_Camera = 1;
+            }
+            modelGoalBall.clearPose();
+            modelBall.clearPose();
+            for(int i = 0;i<v_Camera.size();i++){
+                if(i_Camera == i and !b_CameraFix){
+                    v_Camera[i].enableMouseInput();
+                }else{
+                    v_Camera[i].disableMouseInput();
+                }
+            }
+            modelBall.clearHistory();
+            modelBall.setPos(ofVec3f(-COURT_WIDTH_HALF/2,0,GROUND_LEVEL),ofVec3f(0,0,0));
+            modelBall.throwTo(ofVec3f(4.96,COURT_HEIGHT_HALF,GOAL_HEIGHT+128.8),8.3665);
+        }
 
+        if(v_ScheduleSeg[i_NowScheduleId].s_Name=="fly cg right" or v_ScheduleSeg[i_NowScheduleId].s_Name=="fly cg left"){
+            i_Camera = 3;
+            modelGoalBall.clearPose();
+            modelBall.clearPose();
+            for(int i = 0;i<v_Camera.size();i++){
+                if(i_Camera == i and !b_CameraFix){
+                    v_Camera[i].enableMouseInput();
+                }else{
+                    v_Camera[i].disableMouseInput();
+                }
+            }
+            modelBall.clearHistory();
+            modelBall.setPos(ofVec3f(0,-COURT_HEIGHT_HALF+40,GROUND_LEVEL+10),ofVec3f(2,2,0));
+            modelBall.throwTo(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT+99),10.4);
+            i_AutoStopFlyingBall = 1;
         }
 
         
@@ -453,8 +497,8 @@ void ofApp::update(){
                 i_SceneID = 1;
                 objectFrame.setVisual(0);
                 changeToField();
-                modelGoalBall.clearPose();
-                modelBall.clearPose();
+                //modelGoalBall.clearPose();
+                //modelBall.clearPose();
                 break;
             case ACT_MODE_CAPTURE:
                 objectFrame.setVisual(1);
@@ -465,11 +509,11 @@ void ofApp::update(){
                 v_ScheduleSeg[i_NowScheduleId].video.play();
                 b_SchedulePlaying = true;
                 i_SceneID = 3;
-                if(i_NowScheduleId==2){
+                if(v_ScheduleSeg[i_NowScheduleId].s_Name=="3_L.mp4" or v_ScheduleSeg[i_NowScheduleId].s_Name=="3_R.mp4"){
                     bgm1.setFo();
                     bgm2.play();
                 }
-                if(i_NowScheduleId==8){
+                if(v_ScheduleSeg[i_NowScheduleId].s_Name=="6_L.mp4" or v_ScheduleSeg[i_NowScheduleId].s_Name=="6_R.mp4"){
                     bgm2.setFo();
                     bgm3.play();
                 }
@@ -568,6 +612,12 @@ void ofApp::update(){
     bgm1.update();
     bgm2.update();
     bgm3.update();
+    if(i_AutoStopFlyingBall > 0){
+        i_AutoStopFlyingBall++;
+        if(i_AutoStopFlyingBall>17){
+            modelBall.setPose();
+        }
+    }
 
 }
 
@@ -838,8 +888,11 @@ void ofApp::draw3D(){
                 //ofTranslate(0,pf_Buf6 * (pf_Buf3+pf_Buf4),pf_Buf6*pf_Buf5);
                 modelGoalBall.draw();
             }else{
-                modelBall.draw();
-                modelGameBall.draw();
+                if(i_Camera==(v_Camera.size()-2) or (v_ScheduleSeg[i_NowScheduleId].s_Name=="fly game")){
+                    modelGameBall.draw();
+                }else{
+                    modelBall.draw();
+                }
             }
             ballLight.disable();
 

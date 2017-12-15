@@ -36,6 +36,7 @@ public:
 
     void togglePose();
     void clearPose();
+    void setPose();
     void startReplay();
     void startReverse();
     void clearHistory();

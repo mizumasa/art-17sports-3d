@@ -27,8 +27,8 @@ void ofxObjectBall::update(){
         if(!b_NoResistance)vf_Speed -= vf_Speed/80.0;
         vf_Rotate += vf_RotateSpeed;
         vf_Pos += vf_Speed;
-        if(vf_Pos[2]<GROUND_LEVEL){
-            vf_Pos[2]=GROUND_LEVEL;
+        if(vf_Pos[2]<GROUND_LEVEL+5){
+            vf_Pos[2]=GROUND_LEVEL+5;
             vf_Speed[2] = -vf_Speed[2]*2/3;
             //vf_Pos[2] = GROUND_LEVEL;
             if(abs(vf_Speed[0])<0.1){
@@ -176,7 +176,10 @@ void ofxObjectBall::togglePose(){
     b_Pose = !b_Pose;
 }
 void ofxObjectBall::clearPose(){
-    b_Pose = false;;
+    b_Pose = false;
+}
+void ofxObjectBall::setPose(){
+    b_Pose = true;
 }
 
 void ofxObjectBall::startReplay(){

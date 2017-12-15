@@ -220,6 +220,7 @@ public:
     
     int i_PanelColorMode;
     
+    int i_AutoStopFlyingBall;
     //below cam
     
 #ifdef USE_DETECTION
