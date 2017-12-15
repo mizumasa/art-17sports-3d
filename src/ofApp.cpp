@@ -119,8 +119,14 @@ void ofApp::setup(){
             break;
     }
     
-    bgm.load("bgm.mp3");
-    bgm.setVolume(1.0);
+    //bgm.load("bgm.mp3");
+    //bgm.setVolume(1.0);
+    bgm1.load("intro_BGM.wav");
+    bgm1.setVolume(1.0);
+    bgm2.load("interaction_bgm.wav");
+    bgm2.setVolume(1.0);
+    bgm3.load("end_bgm.wav");
+    bgm3.setVolume(1.0);
     buzzer.load("buzzer.wav");
     buzzer.setVolume(1.0);
     buzzer.setLoop(false);
@@ -936,7 +942,9 @@ void ofApp::keyPressed(int key){
             }
             break;
         case 's':
-            bgm.stop();
+            bgm1.stop();
+            bgm2.stop();
+            bgm3.stop();
             break;
         case 't':
             b_TestLight = !b_TestLight;

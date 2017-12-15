@@ -204,14 +204,15 @@ public:
     ofImage i_BigSightMask;
     ofImage i_BigSightMask2;
     int i_BigSightMaskMode;
-    ofSoundPlayer bgm;
+    ofSoundPlayer bgm1;
+    ofSoundPlayer bgm2;
+    ofSoundPlayer bgm3;
     ofSoundPlayer buzzer;
     vector<ofxObjectPanel> v_ObjectPanel;
     ofxObjectPanels2 objectPanel2;
     ofxObjectFrame objectFrame;
     ofxObjectCountdowns objectCountdown;
     int i_PanelScore;
-    
     
     //below cam
     
