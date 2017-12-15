@@ -12,6 +12,7 @@
 #include "ofxObjectCountdown.h"
 #include "ofxObjectEffect.h"
 #include "ofxObjectRing.h"
+#include "ofxObjectHand.h"
 #include "ofxBGM.h"
 #include "ofxGui.h"
 #include "ofxBlackMagic.h"
@@ -221,6 +222,8 @@ public:
     int i_PanelColorMode;
     
     int i_AutoStopFlyingBall;
+    ofxObjectHands objectHands;
+    
     //below cam
     
 #ifdef USE_DETECTION

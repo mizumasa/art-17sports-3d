@@ -618,6 +618,7 @@ void ofApp::update(){
             modelBall.setPose();
         }
     }
+    objectHands.update();
 
 }
 
@@ -734,6 +735,8 @@ void ofApp::draw(){
     ofPopMatrix();
     
     ofEnableAlphaBlending();
+    objectHands.draw();
+
     if(i_BigSightMaskMode==0)i_BigSightMask.draw(0,0,ofGetWidth(),ofGetHeight());
     if(i_BigSightMaskMode==1)i_BigSightMask2.draw(0,0,ofGetWidth(),ofGetHeight());
     if(b_GuiDraw){
@@ -1032,7 +1035,7 @@ void ofApp::keyPressed(int key){
                 modelBall.togglePose();
             }
             break;
-        case ';':
+        /*case ';':
             if(i_Camera == (v_Camera.size()-1)){
                 modelGoalBall.startReplay();
             }else{
@@ -1045,6 +1048,13 @@ void ofApp::keyPressed(int key){
             }else{
                 modelBall.startReverse();
             }
+            break;
+         */
+        case ';':
+            objectHands.play(0);
+            break;
+        case '/':
+            objectHands.play(1);
             break;
         case 'q':
             bgm1.play();
