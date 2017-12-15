@@ -614,7 +614,13 @@ void ofApp::draw(){
     for(int i = 0; i<v_ObjectPanel.size(); i++){
         v_ObjectPanel[i].draw();
     }
+    ofPushStyle();
+    if(i_WindowMode==0){
+        ofEnableAlphaBlending();
+        ofSetColor(255, 255, 255, 120);
+    }
     objectFrame.draw();
+    ofPopStyle();
     objectCountdown.draw();
     ofPopMatrix();
     objectPanel2.draw();
@@ -1000,12 +1006,16 @@ void ofApp::keyPressed(int key){
             break;
         case '3':
             objectCountdown.start(0);
+            objectFrame.setBlinkTimer(30);
             break;
         case '4':
             objectCountdown.start(1);
             break;
         case '5':
             objectCountdown.start(2);
+            break;
+        case '6':
+            objectCountdown.start(3);
             break;
         /*case '3':
             i_SceneID = 3;

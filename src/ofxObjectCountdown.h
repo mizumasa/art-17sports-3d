@@ -30,5 +30,7 @@ public:
 private:
     vector<ofxObjectCountdown> v_Panel;
     vector<ofImage> v_Image;
+    vector<vector<ofSoundPlayer>> vv_Sound;
+    int i_power;
 };
 #endif

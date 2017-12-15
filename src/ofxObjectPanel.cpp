@@ -223,6 +223,7 @@ void ofxObjectPanelFrame::draw(){
 ofxObjectFrame::ofxObjectFrame(){
     b_Blink = false;
     t_Count = 0;
+    i_BlinkCount = 0;
 }
 
 void ofxObjectFrame::setPoints(){
@@ -250,11 +251,26 @@ void ofxObjectFrame::update(){
         v_Frame[i].i_ColorMode = i_ColorMode;
         v_Frame[i].update();
     }
+    if(i_BlinkCount){
+        i_BlinkCount ++;
+        if(i_BlinkCount > i_BlinkMax){
+            i_BlinkCount = 0;
+            b_Blink = false;
+        }
+    }
 }
 
 void ofxObjectFrame::setBlink(bool _state){
     b_Blink = _state;
 }
+
+void ofxObjectFrame::setBlinkTimer(int i_time){
+    i_BlinkMax = i_time;
+    b_Blink = true;
+    i_BlinkCount = 1;
+}
+
+
 
 void ofxObjectFrame::noGravity(){
     for(int i=0;i<v_Frame.size();i++){

@@ -101,6 +101,7 @@ public:
     void setGravity(float _gravity);
     void setPoints();
     void setBlink(bool _state);
+    void setBlinkTimer(int i_time);
     uint64_t t_Count;
     int i_ColorMode;
     
@@ -109,6 +110,8 @@ private:
     bool b_Left;
     bool b_Blink;
     vector<ofxObjectPanelFrame> v_Frame;
+    int i_BlinkCount;
+    int i_BlinkMax;
 };
 
 
