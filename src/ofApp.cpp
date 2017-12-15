@@ -683,7 +683,11 @@ void ofApp::update(){
                         {
                             ofxOscMessage m;
                             m.setAddress("/between/scene");
-                            m.addIntArg(i_NowScheduleId);
+                            if( i_NowScheduleId > 2){
+                                m.addIntArg(i_NowScheduleId - 1);
+                            }else{
+                                m.addIntArg(i_NowScheduleId);
+                            }
                             sendBetweenLR.sendMessage(m);
                         }
                         cout << i_NowScheduleId << " start"<<endl;
