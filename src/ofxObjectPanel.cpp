@@ -148,6 +148,7 @@ ofxObjectPanelFrame::ofxObjectPanelFrame(){
     t_Count = 0;
     b_Pose = true;
     b_Left = false;
+    i_Alpha = 255;
 }
 
 //--------------------------------------------------------------
@@ -158,8 +159,9 @@ void ofxObjectPanelFrame::start(){
     vf_Speed = ofVec3f(ofRandom(-10.0, 10.0), ofRandom(0,10.0), 0);
 }
 //--------------------------------------------------------------
-void ofxObjectPanelFrame::update(){
+void ofxObjectPanelFrame::update(int _i_Alpha){
     t_Count += 1;
+    i_Alpha = _i_Alpha;
     /*if(t_Count > FLY_TIME){
         //b_Pose = true;
     }else{
@@ -198,10 +200,12 @@ void ofxObjectPanelFrame::draw(){
     ofPushMatrix();
     ofPushStyle();
     //ofSetColor(int(color[0]), int(color[1]), int(color[2]));
+    ofEnableAlphaBlending();
     ofSetColor(
                frameColorMode[i_ColorMode][0],
                frameColorMode[i_ColorMode][1],
-               frameColorMode[i_ColorMode][2]
+               frameColorMode[i_ColorMode][2],
+               i_Alpha
     );
     
     ofTranslate(nowPos+vf_Pos);
@@ -224,6 +228,8 @@ ofxObjectFrame::ofxObjectFrame(){
     b_Blink = false;
     t_Count = 0;
     i_BlinkCount = 0;
+    b_Visible = true;
+    i_Alpha = 255;
 }
 
 void ofxObjectFrame::setPoints(){
@@ -241,15 +247,17 @@ void ofxObjectFrame::draw(){
     if(b_Blink and (t_Count%2==0)){
         return;
     }
-    for(int i=0;i<v_Frame.size();i++){
-        v_Frame[i].draw();
+    if(b_Visible){
+        for(int i=0;i<v_Frame.size();i++){
+            v_Frame[i].draw();
+        }
     }
 }
 void ofxObjectFrame::update(){
     t_Count += 1;
     for(int i=0;i<v_Frame.size();i++){
         v_Frame[i].i_ColorMode = i_ColorMode;
-        v_Frame[i].update();
+        v_Frame[i].update(i_Alpha);
     }
     if(i_BlinkCount){
         i_BlinkCount ++;
@@ -282,3 +290,20 @@ void ofxObjectFrame::setGravity(float _gravity){
         v_Frame[i].setGravity(_gravity);
     }
 }
+
+void ofxObjectFrame::setVisual(int i_mode){
+    switch(i_mode){
+        case 0://visible
+            b_Visible = true;
+            i_Alpha = 255;
+            break;
+        case 1://alpha
+            b_Visible = true;
+            i_Alpha = 120;
+            break;
+        case 2://no visible
+            b_Visible = false;
+            break;
+    }
+}
+

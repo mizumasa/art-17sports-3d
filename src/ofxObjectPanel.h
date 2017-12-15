@@ -71,7 +71,7 @@ public:
     ofxObjectPanelFrame();
     void start();
     void draw();
-    void update();
+    void update(int _i_Alpha);
     void noGravity();
     void setPoint(ofVec2f _pos);
     void setGravity(float _gravity);
@@ -90,6 +90,7 @@ private:
     ofVec2f tCenter;
     ofVec2f nowPos;
     ofVec3f color;
+    int i_Alpha;
 };
 
 class ofxObjectFrame{
@@ -104,6 +105,7 @@ public:
     void setBlinkTimer(int i_time);
     uint64_t t_Count;
     int i_ColorMode;
+    void setVisual(int i_mode);
     
 private:
     bool b_Pose;
@@ -112,6 +114,8 @@ private:
     vector<ofxObjectPanelFrame> v_Frame;
     int i_BlinkCount;
     int i_BlinkMax;
+    bool b_Visible;
+    int i_Alpha;
 };
 
 

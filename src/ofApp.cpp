@@ -415,14 +415,17 @@ void ofApp::update(){
         switch(v_ScheduleSeg[i_NowScheduleId].actMode){
             case ACT_MODE_CG:
                 i_SceneID = 1;
+                objectFrame.setVisual(0);
                 changeToField();
                 modelGoalBall.clearPose();
                 modelBall.clearPose();
                 break;
             case ACT_MODE_CAPTURE:
+                objectFrame.setVisual(1);
                 i_SceneID = 2;
                 break;
             case ACT_MODE_MOVIE:
+                objectFrame.setVisual(2);
                 v_ScheduleSeg[i_NowScheduleId].video.play();
                 b_SchedulePlaying = true;
                 i_SceneID = 3;
