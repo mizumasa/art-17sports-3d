@@ -674,9 +674,9 @@ void ofApp::update(){
         recvBetweenLR.getNextMessage(&m);
         if(m.getAddress() == "/between/scene"){
             cout << "scene change got:"<< m.getArgAsInt(0) <<endl;
-            ofxOscMessage m;
-            m.setAddress("/between/got");
-            sendBetweenLR.sendMessage(m);
+            ofxOscMessage m2;
+            m2.setAddress("/between/got");
+            sendBetweenLR.sendMessage(m2);
         }
         if(m.getAddress() == "/between/got"){
             cout << "Between OSC got" << endl;

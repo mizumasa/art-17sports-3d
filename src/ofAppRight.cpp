@@ -11,7 +11,7 @@
 
 void ofApp::setupRight(){
     s_RightIP = XML.getValue<string>("//RIGHTIP");
-    s_LeftIP = XML.getValue<string>("//LeftIP");
+    s_LeftIP = XML.getValue<string>("//LEFTIP");
     cout << "right mode:" << s_RightIP << endl;
     sendBetweenLR.setup(s_LeftIP, BETWEEN_LR_PORT);
     cout << "between osc send mode: to" << s_LeftIP<< ":"<< BETWEEN_LR_PORT << endl;
