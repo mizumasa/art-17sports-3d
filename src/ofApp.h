@@ -12,6 +12,7 @@
 #include "ofxObjectCountdown.h"
 #include "ofxObjectEffect.h"
 #include "ofxObjectRing.h"
+#include "ofxObjectBGM.h"
 #include "ofxGui.h"
 #include "ofxBlackMagic.h"
 #include "common.h"
@@ -204,9 +205,11 @@ public:
     ofImage i_BigSightMask;
     ofImage i_BigSightMask2;
     int i_BigSightMaskMode;
-    ofSoundPlayer bgm1;
-    ofSoundPlayer bgm2;
-    ofSoundPlayer bgm3;
+    ofxObjectBGM bgm1;
+    ofxObjectBGM bgm2;
+    ofxObjectBGM bgm3;
+    //ofSoundPlayer bgm2;
+    //ofSoundPlayer bgm3;
     ofSoundPlayer buzzer;
     vector<ofxObjectPanel> v_ObjectPanel;
     ofxObjectPanels2 objectPanel2;

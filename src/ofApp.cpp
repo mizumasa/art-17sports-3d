@@ -121,12 +121,12 @@ void ofApp::setup(){
     
     //bgm.load("bgm.mp3");
     //bgm.setVolume(1.0);
-    bgm1.load("intro_BGM.wav");
-    bgm1.setVolume(1.0);
-    bgm2.load("interaction_bgm.wav");
-    bgm2.setVolume(1.0);
-    bgm3.load("end_bgm.wav");
-    bgm3.setVolume(1.0);
+    bgm1.bgm.load("bgm/intro_BGM.wav");
+    bgm1.bgm.setVolume(1.0);
+    bgm2.bgm.load("bgm/interaction_bgm.wav");
+    bgm2.bgm.setVolume(1.0);
+    bgm3.bgm.load("bgm/end_bgm.wav");
+    bgm3.bgm.setVolume(1.0);
     buzzer.load("buzzer.wav");
     buzzer.setVolume(1.0);
     buzzer.setLoop(false);
@@ -407,10 +407,10 @@ void ofApp::update(){
         b_ScheduleStart = false;
         b_SchedulePlaying = false;
         if(i_NowScheduleId==0){
-            bgm.play();
+            //bgm.play();
         }
         if(i_NowScheduleId==(v_ScheduleSeg.size()-2)){
-            buzzer.play();
+            //buzzer.play();
         }
         switch(v_ScheduleSeg[i_NowScheduleId].actMode){
             case ACT_MODE_CG:
@@ -426,6 +426,14 @@ void ofApp::update(){
                 v_ScheduleSeg[i_NowScheduleId].video.play();
                 b_SchedulePlaying = true;
                 i_SceneID = 3;
+                if(i_NowScheduleId==2){
+                    bgm1.setFo();
+                    bgm2.play();
+                }
+                if(i_NowScheduleId==8){
+                    bgm2.setFo();
+                    bgm3.play();
+                }
                 break;
             default:
                 break;
@@ -517,6 +525,10 @@ void ofApp::update(){
     if(b_GuiDraw and (modelGameBall.t_Count%125==0)){
         cout <<"{"<< modelGameBall.getPos() <<","<< modelGameBall.vf_Speed <<"},"<< endl;
     }
+    bgm1.update();
+    bgm2.update();
+    bgm3.update();
+
 }
 
 //update--------------------------------------------------------------
@@ -579,8 +591,6 @@ void ofApp::update3D(){
         ballParticle.addPoint(modelBall.getPos());
     }
     ballParticle.update();
-
-    
 }
 
 
@@ -941,10 +951,36 @@ void ofApp::keyPressed(int key){
                 modelBall.startReverse();
             }
             break;
+        case 'q':
+            bgm1.play();
+            break;
+        case 'a':
+            bgm2.play();
+            break;
+        case 'z':
+            bgm3.play();
+            break;
         case 's':
-            bgm1.stop();
-            bgm2.stop();
-            bgm3.stop();
+            bgm1.bgm.stop();
+            bgm2.bgm.stop();
+            bgm3.bgm.stop();
+            break;
+        case 'd':
+            if(bgm1.bgm.isPlaying())bgm1.setDown();
+            if(bgm2.bgm.isPlaying())bgm2.setDown();
+            if(bgm3.bgm.isPlaying())bgm3.setDown();
+            break;
+        case 'u':
+            if(bgm1.bgm.isPlaying())bgm1.setUp();
+            if(bgm2.bgm.isPlaying())bgm2.setUp();
+            if(bgm3.bgm.isPlaying())bgm3.setUp();
+            break;
+        case 'o':
+            if(bgm1.bgm.isPlaying()){
+                bgm1.setFo();
+            }
+            if(bgm2.bgm.isPlaying())bgm2.setFo();
+            if(bgm3.bgm.isPlaying())bgm3.setFo();
             break;
         case 't':
             b_TestLight = !b_TestLight;
