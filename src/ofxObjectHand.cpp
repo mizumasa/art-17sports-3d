@@ -7,14 +7,16 @@ ofxObjectHands::ofxObjectHands(){
     vector<ofImage> buf;
     for(int i=0;i<30;i++){//120
         ofImage buf2;
-        buf2.load("hantokei/hantokei_0"+ofToString(i+2091+bias)+".png");
+        //buf2.load("hantokei/hantokei_0"+ofToString(i+2091+bias)+".png");
+        buf2.load("L/L_0"+ofToString(i+1000+bias)+".png");
         buf.push_back(buf2);
     }
     vector<ofImage> buf3;
     vv_image.push_back(buf);
     for(int i=0;i<30;i++){//120
         ofImage buf4;
-        buf4.load("tokei/tokei_0"+ofToString(i+2211+bias)+".png");
+        //buf4.load("tokei/tokei_0"+ofToString(i+2211+bias)+".png");
+        buf4.load("R/R_0"+ofToString(i+1000+bias)+".png");
         buf3.push_back(buf4);
     }
     vv_image.push_back(buf3);
@@ -25,10 +27,13 @@ void ofxObjectHands::play(int mode){
     t_Count = 1;
 }
 void ofxObjectHands::draw(){
+    ofPushStyle();
+    ofSetColor(255,255, 255, 128);
     if(t_Count>0){
         cout << "test"<<endl;
-        vv_image[i_mode][t_Count-1].draw(ofGetWidth()/3,ofGetHeight()/3,ofGetWidth()/3,ofGetHeight()/3);
+        vv_image[i_mode][t_Count-1].draw(0,0,ofGetWidth(),ofGetHeight());//(ofGetWidth()/3,ofGetHeight()/3,ofGetWidth()/3,ofGetHeight()/3);
     }
+    ofPopStyle();
 }
 
 void ofxObjectHands::update(){

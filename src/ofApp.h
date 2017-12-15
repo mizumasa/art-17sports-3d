@@ -224,6 +224,11 @@ public:
     int i_AutoStopFlyingBall;
     ofxObjectHands objectHands;
     
+    
+    //Automation
+    bool b_AutoSeq;
+    
+    
     //below cam
     
 #ifdef USE_DETECTION
