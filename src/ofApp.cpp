@@ -704,6 +704,7 @@ void ofApp::update(){
                         }
                         cout << i_NowScheduleId << " start"<<endl;
                     }else{
+                        i_NextScheduleId = i_NowScheduleId;
                         b_AutomatorOn = false;
                     }
                 }
