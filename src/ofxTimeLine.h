@@ -8,32 +8,25 @@
 
 #include "ofMain.h"
 
+#define SCENE1_START 0
+#define SCENE2_START 10
+#define COUNT_2_SEC 0.8
+#define COUNT_3_SEC 0.7
+#define COUNT_4_SEC 0.6
+#define COUNT_5_SEC 0.5
+#define COUNT_6_SEC 0.4
+#define COUNT_7_SEC 0.4
+
 #define TIMELINE_SPEED 1
-#define STEP_NUM 29
-#define ACT_ID_NUM 12
+#define STEP_NUM 35
+#define ACT_ID_NUM 11
 
 enum ACT_ID{
     AID_INIT = 0,
-    AID_CHANGE_ANGLE,
-    AID_MOVE_ANGLE,
-    AID_MOVE_HUMAN,
-    AID_HUMAN_ZOOM_IN,
-    AID_FADEOUT,//5
-    AID_CHANGE_SCENE_TO_CHROME,
-    AID_FADEIN,
-    AID_CHANGE_SITE,
-    AID_SCROLL,
-    AID_HUMAN_ZOOM_OUT,//10
-    AID_LOOP_BACK,
-    AID_CHANGE_SCENE_TO_WORLD,
-    AID_MOVE_TO_NEWFACE,
-    AID_SITE_START,
-    AID_NEWFACE_CAME,//15
-    AID_MOVE_HUMAN_DUMMY,
-    AID_LOGO_OFF,
-    AID_LOGO_ON,
-    AID_ROLLCAM_IN,
-    AID_ROLLCAM_OUT,
+    AID_COUNT_1,
+    AID_CHANGE_TO_THROW_1,
+    AID_COUNT_2,
+    AID_CHANGE_TO_THROW_2,
 };
 
 class ofxTimeLine : public ofBaseApp{

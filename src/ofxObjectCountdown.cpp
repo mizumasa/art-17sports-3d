@@ -65,6 +65,11 @@ ofxObjectCountdowns::ofxObjectCountdowns(){
     }
 }
 
+//--------------------------------------------------------------
+void ofxObjectCountdowns::init(){
+    i_power = 0;
+}
+
 void ofxObjectCountdowns::draw(){
     for(int i=0;i<v_Panel.size();i++){
         v_Panel[i].draw();

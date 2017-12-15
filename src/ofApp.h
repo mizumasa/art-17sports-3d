@@ -184,6 +184,9 @@ public:
 
     ofxOscReceiver receiver;
     
+    ofxOscSender sendBetweenLR;
+    ofxOscReceiver recvBetweenLR;
+    
     
     ofImage            lenna;
     bool            bDrawLenna;
@@ -222,13 +225,21 @@ public:
     int i_PanelColorMode;
     
     int i_AutoStopFlyingBall;
+
+    int i_AutoNextFlyingBallFail;
+    int i_AutoNextFlyingBall;
+    int i_AutoNextFlyingGameBall;
+    int i_CountFromSceneStart;
+
     ofxObjectHands objectHands;
     
     
     //Automation
-    bool b_AutoSeq;
+    bool b_AutomatorOn;
     
-    
+    uint64_t t_Game1StartTime;
+    uint64_t t_Game2StartTime;
+
     //below cam
     
 #ifdef USE_DETECTION

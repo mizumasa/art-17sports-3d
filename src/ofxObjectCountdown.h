@@ -27,6 +27,7 @@ public:
     void draw();
     void update();
     void start(int countnum);
+    void init();
 private:
     vector<ofxObjectCountdown> v_Panel;
     vector<ofImage> v_Image;

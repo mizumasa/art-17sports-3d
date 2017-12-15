@@ -99,6 +99,7 @@ int right_pos[RIGHT_POS_NUM][3][2]={{{128, 62}, {240, 62}, {188, 159}},
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+    b_AutomatorOn = false;
     ofSetFrameRate(30);
     if(XML.load("settings.xml") ){cout << "setting loaded" <<endl;
     }else{cout << "setting load error" <<endl;}
@@ -363,6 +364,8 @@ void ofApp::setup(){
     objectFrame.setPoints();
     
     i_PanelColorMode = 0;
+    
+    timeline.setup();
 }
 
 //update--------------------------------------------------------------
@@ -408,6 +411,7 @@ void ofApp::update(){
     }
 
     if(b_ScheduleStart){
+        i_CountFromSceneStart = 0;
         b_ScheduleStart = false;
         b_SchedulePlaying = false;
         if(i_NowScheduleId==0){
@@ -426,6 +430,8 @@ void ofApp::update(){
             modelBall.clearHistory();
             modelBall.setPos(ofVec3f(-COURT_WIDTH_HALF/2,0,GROUND_LEVEL+10),ofVec3f(0,0,0));
             modelBall.setPose();
+            t_Game1StartTime = ofGetElapsedTimeMillis();
+            objectCountdown.init();
         }
         if(v_ScheduleSeg[i_NowScheduleId].s_Name=="power gauge2" or v_ScheduleSeg[i_NowScheduleId].s_Name=="audience2" ){
             i_Camera = 3;
@@ -435,6 +441,8 @@ void ofApp::update(){
             modelBall.clearHistory();
             modelBall.setPos(ofVec3f(0,-COURT_HEIGHT_HALF+40,GROUND_LEVEL+10),ofVec3f(2,2,0));
             modelBall.setPose();
+            t_Game2StartTime = ofGetElapsedTimeMillis();
+            objectCountdown.init();
         }
         if(v_ScheduleSeg[i_NowScheduleId].s_Name=="fly game"){
             cout<< "fly game "<< endl;
@@ -490,6 +498,15 @@ void ofApp::update(){
             modelBall.throwTo(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT+99),10.4);
             i_AutoStopFlyingBall = 1;
         }
+        if(v_ScheduleSeg[i_NowScheduleId].s_Name=="fly cg fail left"){
+            i_AutoNextFlyingBallFail = 1;
+        }
+        if(v_ScheduleSeg[i_NowScheduleId].s_Name=="fly cg left"){
+            i_AutoNextFlyingBall = 1;
+        }
+        if(v_ScheduleSeg[i_NowScheduleId].s_Name=="fly game audience"){
+            i_AutoNextFlyingGameBall = 1;
+        }
 
         
         switch(v_ScheduleSeg[i_NowScheduleId].actMode){
@@ -531,6 +548,122 @@ void ofApp::update(){
             changeToGoal();
         }*/
     }
+    i_CountFromSceneStart ++;
+    if(b_AutomatorOn){
+        bool b_Continue = true;
+        if(v_ScheduleSeg[i_NowScheduleId].s_Name=="audience1" and b_Continue){
+            timeline.update((ofGetElapsedTimeMillis() - t_Game1StartTime)/1000.0 + SCENE1_START);
+            if(timeline.getState(AID_INIT)){
+                cout << "TIMELINE:INIT" <<endl;
+            }
+            if(timeline.getState(AID_COUNT_1)){
+                cout << "TIMELINE:COUNT" << timeline.getParam(AID_COUNT_1)<<endl;
+                objectCountdown.start(timeline.getParam(AID_COUNT_1));
+                if(timeline.getParam(AID_COUNT_1) == 0){
+                    objectFrame.setBlinkTimer(30);
+                }
+            }
+            if(timeline.getState(AID_CHANGE_TO_THROW_1)){
+                cout << "TIMELINE:CHANGE" <<endl;
+                i_NextScheduleId = i_NowScheduleId + 1;
+                i_NowScheduleId = i_NextScheduleId;
+                scheduleChange();
+                b_ScheduleStart = true;
+                cout << i_NowScheduleId << " start"<<endl;
+                b_Continue = false;
+            }
+        }
+        if(v_ScheduleSeg[i_NowScheduleId].s_Name=="audience2" and b_Continue){
+            timeline.update((ofGetElapsedTimeMillis() - t_Game2StartTime)/1000.0 + SCENE2_START);
+            if(timeline.getState(AID_COUNT_2)){
+                cout << "TIMELINE:COUNT2" << timeline.getParam(AID_COUNT_2)<<endl;
+                objectCountdown.start(3-(timeline.getParam(AID_COUNT_2)%4));
+                if(timeline.getParam(AID_COUNT_2)%4 == 3){
+                    objectFrame.setBlinkTimer(30);
+                }
+            }
+            if(timeline.getState(AID_CHANGE_TO_THROW_2)){
+                cout << "TIMELINE:CHANGE2" <<endl;
+                i_NextScheduleId = i_NowScheduleId + 1;
+                i_NowScheduleId = i_NextScheduleId;
+                scheduleChange();
+                b_ScheduleStart = true;
+                cout << i_NowScheduleId << " start"<<endl;
+                b_Continue = false;
+            }
+        }
+        if(v_ScheduleSeg[i_NowScheduleId].s_Name=="fly cg fail left" and b_Continue){
+            if(i_AutoNextFlyingBallFail > 0){
+                i_AutoNextFlyingBallFail ++;
+                if(i_AutoNextFlyingBallFail > 30){
+                    i_AutoNextFlyingBallFail = 0;
+                    i_NextScheduleId = i_NowScheduleId + 1;
+                    i_NowScheduleId = i_NextScheduleId;
+                    scheduleChange();
+                    b_ScheduleStart = true;
+                    cout << i_NowScheduleId << " start"<<endl;
+                    b_Continue = false;
+                }
+            }
+        }
+        if(v_ScheduleSeg[i_NowScheduleId].s_Name=="fly cg left" and b_Continue){
+            if(i_AutoNextFlyingBall > 0){
+                i_AutoNextFlyingBall ++;
+                if(i_AutoNextFlyingBall > 30){
+                    i_AutoNextFlyingBall = 0;
+                    i_NextScheduleId = i_NowScheduleId + 1;
+                    i_NowScheduleId = i_NextScheduleId;
+                    scheduleChange();
+                    b_ScheduleStart = true;
+                    cout << i_NowScheduleId << " start"<<endl;
+                    b_Continue = false;
+                }
+            }
+        }
+        if(v_ScheduleSeg[i_NowScheduleId].s_Name=="fly game audience" and b_Continue){
+            if(i_AutoNextFlyingGameBall > 0){
+                i_AutoNextFlyingGameBall ++;
+                if(i_AutoNextFlyingGameBall == 633){
+                    /*右側にアングル変更の指示送る
+                     i_Camera = (i_Camera +1)%(v_Camera.size()-2);
+                    for(int i = 0;i<v_Camera.size();i++){
+                        if(i_Camera == i and !b_CameraFix){
+                            //if(false){
+                            v_Camera[i].enableMouseInput();
+                        }else{
+                            v_Camera[i].disableMouseInput();
+                        }
+                     }*/
+                }
+                if(i_AutoNextFlyingGameBall > 654){
+                    i_AutoNextFlyingGameBall = 0;
+                    i_NextScheduleId = i_NowScheduleId + 1;
+                    i_NowScheduleId = i_NextScheduleId;
+                    scheduleChange();
+                    b_ScheduleStart = true;
+                    cout << i_NowScheduleId << " start"<<endl;
+                    b_Continue = false;
+                }
+            }
+        }
+
+        if(i_WindowMode == 0 and b_Continue){
+            if(v_ScheduleSeg[i_NowScheduleId].actMode == ACT_MODE_MOVIE){
+                if(! v_ScheduleSeg[i_NowScheduleId].video.isPlaying()){
+                    i_NextScheduleId = i_NowScheduleId + 1;
+                    if(i_NextScheduleId < v_ScheduleSeg.size()){
+                    i_NowScheduleId = i_NextScheduleId;
+                    scheduleChange();
+                    b_ScheduleStart = true;
+                    cout << i_NowScheduleId << " start"<<endl;
+                    }else{
+                        b_AutomatorOn = false;
+                    }
+                }
+            }
+        }
+    }
+    
     if(b_SchedulePlaying){
         v_ScheduleSeg[i_NowScheduleId].video.update();
     }
@@ -752,9 +885,11 @@ void ofApp::draw(){
         info += "Framerate:"+ofToString(ofGetFrameRate())+"\n";
         info += "window size :"+ofToString(ofGetWidth())+"x"+ofToString(ofGetHeight())+"\n";
         info += ofToString(v_ScheduleSeg[i_NextScheduleId].s_Name)+"\n";
-        info += " ";
+        info += "\n";
+        info += "CountFromStart:"+ofToString(i_CountFromSceneStart);
         ofSetColor(255,255,255);
         ofDrawBitmapString(info, 20,gui.getPosition().y + gui.getHeight()+50);
+        timeline.draw();
     }
 }
 
@@ -1029,6 +1164,7 @@ void ofApp::keyPressed(int key){
             objectEffect.add(ofVec3f(ofRandom(-80,80),ofRandom(-120,100),GROUND_LEVEL));
             break;
         case 'p':
+            cout << i_CountFromSceneStart <<endl;
             if(i_Camera == (v_Camera.size()-1)){
                 modelGoalBall.togglePose();
             }else{
@@ -1122,6 +1258,12 @@ void ofApp::keyPressed(int key){
             modelBall.clearHistory();
             modelBall.setPos(ofVec3f(0,-COURT_HEIGHT_HALF+40,GROUND_LEVEL+10),ofVec3f(2,2,0));
             modelBall.throwTo(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT+99),10.4);
+            break;
+        case OF_KEY_RETURN:
+            b_AutomatorOn = true;
+            scheduleChange();
+            b_ScheduleStart = true;
+            cout << i_NowScheduleId << " start"<<endl;
             break;
         case OF_KEY_UP:
             i_NextScheduleId = max(0,i_NextScheduleId-1);
