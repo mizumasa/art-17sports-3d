@@ -587,6 +587,9 @@ void ofApp::update(){
                 scheduleChange();
                 b_ScheduleStart = true;
                 cout << i_NowScheduleId << " start"<<endl;
+                for(int i = 0; i<v_ObjectPanel.size(); i++){
+                    v_ObjectPanel[i].start();
+                }
                 b_Continue = false;
             }
         }
@@ -608,6 +611,9 @@ void ofApp::update(){
                 i_NextScheduleId = i_NowScheduleId + 1;
                 i_NowScheduleId = i_NextScheduleId;
                 scheduleChange();
+                for(int i = 0; i<v_ObjectPanel.size(); i++){
+                    v_ObjectPanel[i].start();
+                }
                 b_ScheduleStart = true;
                 {
                     ofxOscMessage m;
@@ -997,7 +1003,8 @@ void ofApp::draw(){
         info += ofToString(v_ScheduleSeg[i_NextScheduleId].s_Name)+"\n";
         info += "\n";
         info += "CountFromStart:"+ofToString(i_CountFromSceneStart)+"\n";
-        info += "RightPanelLimitNum"+ofToString(i_RightLimitNum);
+        info += "RightPanelLimitNum:"+ofToString(i_RightLimitNum)+"\n";
+        info += "PanelNum:"+ofToString(v_ObjectPanel.size());
         ofSetColor(255,255,255);
         ofDrawBitmapString(info, 20,gui.getPosition().y + gui.getHeight()+50);
         //timeline.draw();
