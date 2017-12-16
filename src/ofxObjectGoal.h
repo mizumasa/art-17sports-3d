@@ -14,8 +14,10 @@ class ofxObjectGoal{
 public:
     ofxObjectGoal();
     void draw();
+    void panelDraw();
 private:
     ofxAssimpModelLoader model;
+    ofImage goalPanel;
 };
 
 #endif

@@ -97,8 +97,9 @@ void ofxObjectPanel2::draw(){
             }else{
                 b_End = true;
             }
-            ofFill();
-            ofDrawCircle(nowPos, i_Size*3);
+            ofNoFill();
+            //ofDrawCircle(nowPos, i_Size*3);
+            ofDrawTriangle(nowPos+ofVec2f(-i_Size*2,i_Size*4), nowPos+ofVec2f(i_Size*2,i_Size*4), nowPos+ofVec2f(0,0));
         }else{
             if(t_Count >= FLY_TIME/2.0){
                 int i_time;
@@ -139,7 +140,7 @@ ofxObjectPanels2::ofxObjectPanels2(){
 }
 
 void ofxObjectPanels2::add(ofVec2f _startPos, ofVec3f _ballShift ,bool _left){
-    if(v_Panel.size()<60){
+    if(v_Panel.size()<80){
         ofxObjectPanel2 bufPanel;
         bufPanel.setStartPos(_startPos);
         bufPanel.setEndPos(ofVec2f(_ballShift[0], - _ballShift[2]));

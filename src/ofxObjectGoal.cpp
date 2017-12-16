@@ -3,6 +3,16 @@
 //--------------------------------------------------------------
 ofxObjectGoal::ofxObjectGoal(){
     model.loadModel("Basketball_Hoop.3DS");
+    goalPanel.load("goalPanel.png");
+}
+
+void ofxObjectGoal::panelDraw(){
+    ofPushMatrix();
+    ofTranslate(0,147,26);
+    ofScale(6.0/100,6.0/100,6.0/100);
+    ofRotateX(90);
+    goalPanel.draw(-goalPanel.getWidth()/2,-goalPanel.getHeight()/2 , goalPanel.getWidth(), goalPanel.getHeight());
+    ofPopMatrix();
 }
 
 //--------------------------------------------------------------

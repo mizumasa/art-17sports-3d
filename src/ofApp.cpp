@@ -603,7 +603,7 @@ void ofApp::update(){
                     objectFrame.setBlinkTimer(30);
                     ofxOscMessage m;
                     m.setAddress("/between/limitnum");
-                    m.addIntArg(10 + 10*objectCountdown.getPower());
+                    m.addIntArg(ofClamp(20 + 10*objectCountdown.getPower(),0,80));
                     sendBetweenLR.sendMessage(m);
                 }
             }
@@ -657,7 +657,7 @@ void ofApp::update(){
         if(v_ScheduleSeg[i_NowScheduleId].s_Name=="fly cg left" and b_Continue){
             if(i_AutoNextFlyingBall > 0){
                 i_AutoNextFlyingBall ++;
-                if(i_AutoNextFlyingBall > 30){
+                if(i_AutoNextFlyingBall > 50){
                     i_AutoNextFlyingBall = 0;
                     i_NextScheduleId = i_NowScheduleId + 1;
                     i_NowScheduleId = i_NextScheduleId;
@@ -1144,6 +1144,16 @@ void ofApp::draw3D(){
             ofRotateZ(180);
             modelGoal.draw();
             ofPopMatrix();
+            
+            ofPushMatrix();
+            //ofTranslate(0,147,26);
+            //ofScale(6.0/100,6.0/100,6.0/100);
+            //ofRotateX(90);
+            modelGoal.panelDraw();
+            ofRotateZ(180);
+            modelGoal.panelDraw();
+            ofPopMatrix();
+            
         }
         {
             ofPushMatrix();
@@ -1170,7 +1180,9 @@ void ofApp::draw3D(){
             ofPopMatrix();
         }
         objectEffect.draw();
-        objectRing.draw();
+        if(i_Camera == (v_Camera.size()-2)){
+            objectRing.draw();
+        }
         {
             ofPushMatrix();
             ofTranslate(0, 0,GROUND_LEVEL);
