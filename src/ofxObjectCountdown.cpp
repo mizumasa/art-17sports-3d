@@ -70,6 +70,10 @@ void ofxObjectCountdowns::init(){
     i_power = 0;
 }
 
+int ofxObjectCountdowns::getPower(){
+    return i_LimitPower;
+}
+
 void ofxObjectCountdowns::draw(){
     for(int i=0;i<v_Panel.size();i++){
         v_Panel[i].draw();
@@ -94,6 +98,7 @@ void ofxObjectCountdowns::start(int countnum){
     vv_Sound[i_power][countnum].play();
     if(countnum == 0){
         i_power ++;
+        i_LimitPower = i_power;
         if (i_power == 7){
             i_power = 0;
         }

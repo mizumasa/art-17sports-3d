@@ -243,6 +243,10 @@ public:
 
     bool b_DummyMovie;
     ofVideoPlayer         dummyMovie;
+    
+    bool b_Black;
+    
+    int i_RightLimitNum;
 
     //below cam
     

@@ -28,10 +28,12 @@ public:
     void update();
     void start(int countnum);
     void init();
+    int getPower();
 private:
     vector<ofxObjectCountdown> v_Panel;
     vector<ofImage> v_Image;
     vector<vector<ofSoundPlayer>> vv_Sound;
     int i_power;
+    int i_LimitPower;
 };
 #endif

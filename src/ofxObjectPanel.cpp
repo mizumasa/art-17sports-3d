@@ -100,13 +100,13 @@ void ofxObjectPanel::setStartPos(ofVec2f _startPos,ofVec2f _t1,ofVec2f _t2,ofVec
     t2 = _t2;
     t3 = _t3;
     tCenter = (t1+t2+t3)/3;
-    color = ofVec3f(ofClamp(colorMode[i_ColorMode][0][0] + ofRandom(-10,10),0,255),
-                    ofClamp(colorMode[i_ColorMode][0][1] + ofRandom(-10,10),0,255),
-                    ofClamp(colorMode[i_ColorMode][0][2] + ofRandom(-10,10),0,255))
+    color = ofVec3f(ofClamp(colorMode[i_ColorMode][0][0] + ofRandom(-20,20),0,255),
+                    ofClamp(colorMode[i_ColorMode][0][1] + ofRandom(-20,20),0,255),
+                    ofClamp(colorMode[i_ColorMode][0][2] + ofRandom(-20,20),0,255))
     * tCenter[1] / MACBOOKPRO_H +
-    ofVec3f(ofClamp(colorMode[i_ColorMode][1][0] + ofRandom(-10,10),0,255),
-            ofClamp(colorMode[i_ColorMode][1][1] + ofRandom(-10,10),0,255),
-            ofClamp(colorMode[i_ColorMode][1][2] + ofRandom(-10,10),0,255)) * (MACBOOKPRO_H - tCenter[1]) / MACBOOKPRO_H;
+    ofVec3f(ofClamp(colorMode[i_ColorMode][1][0] + ofRandom(-20,20),0,255),
+            ofClamp(colorMode[i_ColorMode][1][1] + ofRandom(-20,20),0,255),
+            ofClamp(colorMode[i_ColorMode][1][2] + ofRandom(-20,20),0,255)) * (MACBOOKPRO_H - tCenter[1]) / MACBOOKPRO_H;
 }
 
 void ofxObjectPanel::noGravity(){
@@ -130,6 +130,9 @@ void ofxObjectPanel::draw(){
     ofRotateZ(vf_Rotate[2]);
     ofTranslate(t1 - tCenter);
     ofFill();
+    if(b_Left){
+        ofScale(0.3, 0.3);
+    }
     ofDrawTriangle( ofVec2f(0,0), t2-t1, t3-t1);
     ofPopStyle();
     ofPopMatrix();

@@ -99,6 +99,8 @@ int right_pos[RIGHT_POS_NUM][3][2]={{{128, 62}, {240, 62}, {188, 159}},
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+    i_RightLimitNum = 0;
+    b_Black = false;
     b_DummyMovie = false;
     dummyMovie.loadMovie("dummy.mp4");
     dummyMovie.setVolume(0.0);
@@ -432,6 +434,7 @@ void ofApp::update(){
 
         modelBall.clearPose();
         if(v_ScheduleSeg[i_NowScheduleId].s_Name=="power gauge1" or v_ScheduleSeg[i_NowScheduleId].s_Name=="audience1" ){
+            i_RightLimitNum = 0;
             i_Camera = 3;
             i_PanelColorMode = 0;
             v_ObjectPanel.clear();
@@ -443,6 +446,7 @@ void ofApp::update(){
             objectCountdown.init();
         }
         if(v_ScheduleSeg[i_NowScheduleId].s_Name=="power gauge2" or v_ScheduleSeg[i_NowScheduleId].s_Name=="audience2" ){
+            i_RightLimitNum = 0;
             i_Camera = 3;
             i_PanelColorMode = 1;
             v_ObjectPanel.clear();
@@ -570,6 +574,10 @@ void ofApp::update(){
                 objectCountdown.start(timeline.getParam(AID_COUNT_1));
                 if(timeline.getParam(AID_COUNT_1) == 0){
                     objectFrame.setBlinkTimer(30);
+                    ofxOscMessage m;
+                    m.setAddress("/between/limitnum");
+                    m.addIntArg(40);
+                    sendBetweenLR.sendMessage(m);
                 }
             }
             if(timeline.getState(AID_CHANGE_TO_THROW_1)){
@@ -589,6 +597,10 @@ void ofApp::update(){
                 objectCountdown.start(3-(timeline.getParam(AID_COUNT_2)%4));
                 if(timeline.getParam(AID_COUNT_2)%4 == 3){
                     objectFrame.setBlinkTimer(30);
+                    ofxOscMessage m;
+                    m.setAddress("/between/limitnum");
+                    m.addIntArg(10 + 10*objectCountdown.getPower());
+                    sendBetweenLR.sendMessage(m);
                 }
             }
             if(timeline.getState(AID_CHANGE_TO_THROW_2)){
@@ -734,6 +746,15 @@ void ofApp::update(){
                 i_NextScheduleId = i_NowScheduleId;
                 scheduleChange();
                 b_ScheduleStart = true;
+            }
+            ofxOscMessage m2;
+            m2.setAddress("/between/got");
+            sendBetweenLR.sendMessage(m2);
+        }
+        if(m.getAddress() == "/between/limitnum"){
+            cout << "limit num got:"<< m.getArgAsInt(0) <<endl;
+            if(b_AutomatorOn){
+                i_RightLimitNum = m.getArgAsInt(0);
             }
             ofxOscMessage m2;
             m2.setAddress("/between/got");
@@ -975,10 +996,14 @@ void ofApp::draw(){
         info += "window size :"+ofToString(ofGetWidth())+"x"+ofToString(ofGetHeight())+"\n";
         info += ofToString(v_ScheduleSeg[i_NextScheduleId].s_Name)+"\n";
         info += "\n";
-        info += "CountFromStart:"+ofToString(i_CountFromSceneStart);
+        info += "CountFromStart:"+ofToString(i_CountFromSceneStart)+"\n";
+        info += "RightPanelLimitNum"+ofToString(i_RightLimitNum);
         ofSetColor(255,255,255);
         ofDrawBitmapString(info, 20,gui.getPosition().y + gui.getHeight()+50);
         //timeline.draw();
+    }
+    if(b_Black){
+        ofBackground(0, 0, 0);
     }
 }
 
@@ -1347,12 +1372,16 @@ void ofApp::keyPressed(int key){
             modelBall.setPos(ofVec3f(-COURT_WIDTH_HALF/2,0,GROUND_LEVEL),ofVec3f(0,0,0));
             modelBall.throwTo(ofVec3f(4.96,COURT_HEIGHT_HALF,GOAL_HEIGHT+128.8),8.3665);
             break;
+        case 'k':
+            b_Black = !b_Black;
+            break;
         case ']':
             modelBall.clearHistory();
             modelBall.setPos(ofVec3f(0,-COURT_HEIGHT_HALF+40,GROUND_LEVEL+10),ofVec3f(2,2,0));
             modelBall.throwTo(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT+99),10.4);
             break;
         case OF_KEY_RETURN:
+            b_Black = false;
             b_AutomatorOn = true;
             scheduleChange();
             b_ScheduleStart = true;
@@ -1398,6 +1427,12 @@ void ofApp::keyPressed(int key){
             break;
         case '6':
             objectCountdown.start(3);
+            break;
+        case '7':
+            i_RightLimitNum = ofClamp(i_RightLimitNum-1, 0, RIGHT_POS_NUM);
+            break;
+        case '8':
+            i_RightLimitNum = ofClamp(i_RightLimitNum+1, 0, RIGHT_POS_NUM);
             break;
         /*case '3':
             i_SceneID = 3;
@@ -1567,22 +1602,27 @@ void ofApp::mousePressed(int x, int y, int button){
        v_ScheduleSeg[i_NowScheduleId].s_Name=="power gauge1" or
        v_ScheduleSeg[i_NowScheduleId].s_Name=="power gauge2"
        ){
-        if(i_PanelScore >= RIGHT_POS_NUM){
+        if(i_PanelScore > RIGHT_POS_NUM){
             i_PanelScore = 0;
             v_ObjectPanel.clear();
         }
-        ofxObjectPanel bufPanel;
-        int i_Offset1,i_Offset2;
-        i_Offset1 =  - ofGetWidth()*i_WindowMode;
-        i_Offset2 =  ofGetWidth()* (1 - i_WindowMode);
-        bufPanel.i_ColorMode = i_PanelColorMode;
-        bufPanel.setStartPos(ofVec2f(i_Offset1 + x,y),
-                             ofVec2f(i_Offset2 + right_pos[RIGHT_POS_NUM-1-i_PanelScore][0][0],right_pos[RIGHT_POS_NUM-1-i_PanelScore][0][1]),
-                             ofVec2f(i_Offset2 + right_pos[RIGHT_POS_NUM-1-i_PanelScore][1][0],right_pos[RIGHT_POS_NUM-1-i_PanelScore][1][1]),
-                             ofVec2f(i_Offset2 + right_pos[RIGHT_POS_NUM-1-i_PanelScore][2][0],right_pos[RIGHT_POS_NUM-1-i_PanelScore][2][1]));
+        //int i_RightLimitNum = 0;
+        if(i_WindowMode == 0 or (v_ObjectPanel.size() < i_RightLimitNum)){
+            ofxObjectPanel bufPanel;
+            int i_Offset1,i_Offset2;
+            i_Offset1 =  - ofGetWidth()*i_WindowMode;
+            i_Offset2 =  ofGetWidth()* (1 - i_WindowMode);
+            bufPanel.i_ColorMode = i_PanelColorMode;
+            bufPanel.setLeft((i_WindowMode==0));
+            bufPanel.setStartPos(ofVec2f(i_Offset1 + x,y),
+                                 ofVec2f(i_Offset2 + right_pos[RIGHT_POS_NUM-1-i_PanelScore][0][0],right_pos[RIGHT_POS_NUM-1-i_PanelScore][0][1]),
+                                 ofVec2f(i_Offset2 + right_pos[RIGHT_POS_NUM-1-i_PanelScore][1][0],right_pos[RIGHT_POS_NUM-1-i_PanelScore][1][1]),
+                                 ofVec2f(i_Offset2 + right_pos[RIGHT_POS_NUM-1-i_PanelScore][2][0],right_pos[RIGHT_POS_NUM-1-i_PanelScore][2][1]));
+            
+            i_PanelScore += 1;
+            v_ObjectPanel.push_back(bufPanel);
+        }
         
-        i_PanelScore += 1;
-        v_ObjectPanel.push_back(bufPanel);
     }
     if(v_ScheduleSeg[i_NowScheduleId].s_Name=="fly game audience" or
        v_ScheduleSeg[i_NowScheduleId].s_Name=="fly game"){
