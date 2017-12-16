@@ -241,6 +241,9 @@ public:
     uint64_t t_Game1StartTime;
     uint64_t t_Game2StartTime;
 
+    bool b_DummyMovie;
+    ofVideoPlayer         dummyMovie;
+
     //below cam
     
 #ifdef USE_DETECTION

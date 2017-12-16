@@ -99,6 +99,9 @@ int right_pos[RIGHT_POS_NUM][3][2]={{{128, 62}, {240, 62}, {188, 159}},
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+    b_DummyMovie = false;
+    dummyMovie.loadMovie("dummy.mp4");
+    dummyMovie.setVolume(0.0);
     b_AutomatorOn = false;
     ofSetFrameRate(30);
     if(XML.load("settings.xml") ){cout << "setting loaded" <<endl;
@@ -372,6 +375,11 @@ void ofApp::setup(){
 //update--------------------------------------------------------------
 void ofApp::update(){
 	//areaLight.setPosition(0,-200,0);
+    if(b_DummyMovie){
+        if(!dummyMovie.isPlaying())dummyMovie.play();
+        dummyMovie.update();
+    }
+
     switch(i_WindowMode){
         case 0:
             updateLeft();
@@ -928,6 +936,9 @@ void ofApp::draw(){
     ofPopStyle();
     ofPushMatrix();
     ofDisableLighting();
+    if(b_DummyMovie){
+        dummyMovie.draw(0, 0, ofGetWidth(), ofGetHeight());
+    }
     ofScale(ofGetWidth()/MACBOOKPRO_W, ofGetHeight()/MACBOOKPRO_H);
     for(int i = 0; i<v_ObjectPanel.size(); i++){
         v_ObjectPanel[i].draw();
@@ -967,7 +978,7 @@ void ofApp::draw(){
         info += "CountFromStart:"+ofToString(i_CountFromSceneStart);
         ofSetColor(255,255,255);
         ofDrawBitmapString(info, 20,gui.getPosition().y + gui.getHeight()+50);
-        timeline.draw();
+        //timeline.draw();
     }
 }
 
@@ -1232,6 +1243,10 @@ void ofApp::changeToGoal(){
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
 	switch(key){
+        case '=':
+            cout << "press dummy"<<endl;
+            b_DummyMovie = !b_DummyMovie;
+            break;
         case ' ':
             i_NowScheduleId = i_NextScheduleId;
             scheduleChange();
@@ -1547,33 +1562,33 @@ void ofApp::mousePressed(int x, int y, int button){
     }
     cout << "pos:" << x << ":" << y << endl;
     
-    switch(v_Camera[i_Camera].getChaseBall()){
-        case 2:
-        {
-            objectPanel2.add(ofVec2f(x,y),modelGameBall.vf_SlowShift, (i_WindowMode==0));
+    if(v_ScheduleSeg[i_NowScheduleId].s_Name=="audience1" or
+       v_ScheduleSeg[i_NowScheduleId].s_Name=="audience2" or
+       v_ScheduleSeg[i_NowScheduleId].s_Name=="power gauge1" or
+       v_ScheduleSeg[i_NowScheduleId].s_Name=="power gauge2"
+       ){
+        if(i_PanelScore >= RIGHT_POS_NUM){
+            i_PanelScore = 0;
+            v_ObjectPanel.clear();
         }
-            break;
-        default:
-        {
-            if(i_PanelScore >= RIGHT_POS_NUM){
-                i_PanelScore = 0;
-                v_ObjectPanel.clear();
-            }
-            ofxObjectPanel bufPanel;
-            int i_Offset1,i_Offset2;
-            i_Offset1 =  - ofGetWidth()*i_WindowMode;
-            i_Offset2 =  ofGetWidth()* (1 - i_WindowMode);
-            bufPanel.i_ColorMode = i_PanelColorMode;
-            bufPanel.setStartPos(ofVec2f(i_Offset1 + x,y),
-                                 ofVec2f(i_Offset2 + right_pos[RIGHT_POS_NUM-1-i_PanelScore][0][0],right_pos[RIGHT_POS_NUM-1-i_PanelScore][0][1]),
-                                 ofVec2f(i_Offset2 + right_pos[RIGHT_POS_NUM-1-i_PanelScore][1][0],right_pos[RIGHT_POS_NUM-1-i_PanelScore][1][1]),
-                                 ofVec2f(i_Offset2 + right_pos[RIGHT_POS_NUM-1-i_PanelScore][2][0],right_pos[RIGHT_POS_NUM-1-i_PanelScore][2][1]));
-            
-            i_PanelScore += 1;
-            v_ObjectPanel.push_back(bufPanel);
-        }
-            break;
+        ofxObjectPanel bufPanel;
+        int i_Offset1,i_Offset2;
+        i_Offset1 =  - ofGetWidth()*i_WindowMode;
+        i_Offset2 =  ofGetWidth()* (1 - i_WindowMode);
+        bufPanel.i_ColorMode = i_PanelColorMode;
+        bufPanel.setStartPos(ofVec2f(i_Offset1 + x,y),
+                             ofVec2f(i_Offset2 + right_pos[RIGHT_POS_NUM-1-i_PanelScore][0][0],right_pos[RIGHT_POS_NUM-1-i_PanelScore][0][1]),
+                             ofVec2f(i_Offset2 + right_pos[RIGHT_POS_NUM-1-i_PanelScore][1][0],right_pos[RIGHT_POS_NUM-1-i_PanelScore][1][1]),
+                             ofVec2f(i_Offset2 + right_pos[RIGHT_POS_NUM-1-i_PanelScore][2][0],right_pos[RIGHT_POS_NUM-1-i_PanelScore][2][1]));
+        
+        i_PanelScore += 1;
+        v_ObjectPanel.push_back(bufPanel);
     }
+    if(v_ScheduleSeg[i_NowScheduleId].s_Name=="fly game audience" or
+       v_ScheduleSeg[i_NowScheduleId].s_Name=="fly game"){
+        objectPanel2.add(ofVec2f(x,y),modelGameBall.vf_SlowShift, (i_WindowMode==0));
+    }
+
     
     
 

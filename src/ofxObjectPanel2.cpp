@@ -139,11 +139,13 @@ ofxObjectPanels2::ofxObjectPanels2(){
 }
 
 void ofxObjectPanels2::add(ofVec2f _startPos, ofVec3f _ballShift ,bool _left){
-    ofxObjectPanel2 bufPanel;
-    bufPanel.setStartPos(_startPos);
-    bufPanel.setEndPos(ofVec2f(_ballShift[0], - _ballShift[2]));
-    bufPanel.setLeft(_left);
-    v_Panel.push_back(bufPanel);
+    if(v_Panel.size()<60){
+        ofxObjectPanel2 bufPanel;
+        bufPanel.setStartPos(_startPos);
+        bufPanel.setEndPos(ofVec2f(_ballShift[0], - _ballShift[2]));
+        bufPanel.setLeft(_left);
+        v_Panel.push_back(bufPanel);
+    }
 }
 
 void ofxObjectPanels2::draw(){
@@ -154,6 +156,9 @@ void ofxObjectPanels2::draw(){
 void ofxObjectPanels2::update(){
     for(int i=0;i<v_Panel.size();i++){
         v_Panel[i].update();
+        if(v_Panel[i].getEnd()){
+            v_Panel.erase(v_Panel.begin()+i);
+        }
     }
 }
 void ofxObjectPanels2::noGravity(){
