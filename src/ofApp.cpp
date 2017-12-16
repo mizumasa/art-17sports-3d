@@ -512,6 +512,10 @@ void ofApp::update(){
             i_AutoStopFlyingBall = 1;
         }
         if(v_ScheduleSeg[i_NowScheduleId].s_Name=="fly cg fail left"){
+            ofxOscMessage m;
+            m.setAddress("/between/panelcrash");
+            sendBetweenLR.sendMessage(m);
+
             i_AutoNextFlyingBallFail = 1;
         }
         if(v_ScheduleSeg[i_NowScheduleId].s_Name=="fly cg left"){
@@ -587,9 +591,6 @@ void ofApp::update(){
                 scheduleChange();
                 b_ScheduleStart = true;
                 cout << i_NowScheduleId << " start"<<endl;
-                for(int i = 0; i<v_ObjectPanel.size(); i++){
-                    v_ObjectPanel[i].start();
-                }
                 b_Continue = false;
             }
         }
@@ -611,10 +612,10 @@ void ofApp::update(){
                 i_NextScheduleId = i_NowScheduleId + 1;
                 i_NowScheduleId = i_NextScheduleId;
                 scheduleChange();
-                for(int i = 0; i<v_ObjectPanel.size(); i++){
-                    v_ObjectPanel[i].start();
-                }
                 b_ScheduleStart = true;
+                ofxOscMessage m3;
+                m3.setAddress("/between/panelcrash");
+                sendBetweenLR.sendMessage(m3);
                 {
                     ofxOscMessage m;
                     m.setAddress("/between/scene");
@@ -752,6 +753,14 @@ void ofApp::update(){
                 i_NextScheduleId = i_NowScheduleId;
                 scheduleChange();
                 b_ScheduleStart = true;
+            }
+            ofxOscMessage m2;
+            m2.setAddress("/between/got");
+            sendBetweenLR.sendMessage(m2);
+        }
+        if(m.getAddress() == "/between/panelcrash"){
+            for(int i = 0; i<v_ObjectPanel.size(); i++){
+                v_ObjectPanel[i].start();
             }
             ofxOscMessage m2;
             m2.setAddress("/between/got");
