@@ -29,6 +29,7 @@ void ofxObjectCountdown::draw(){
         ofTranslate(ofGetWidth()/3.0, ofGetHeight()/3.0);
     }
     if(t_Count > 8) ofTranslate((t_Count - 8) * 250, 0);
+    ofScale(0.6, 0.6);
     image.draw(-image.getWidth()/2.0,-image.getHeight()/2.0);
     //image.draw(0,0);
     ofPopMatrix();

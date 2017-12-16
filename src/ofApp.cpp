@@ -970,15 +970,19 @@ void ofApp::draw(){
             break;
     }
     ofPopStyle();
+    
     ofPushMatrix();
     ofDisableLighting();
     if(b_DummyMovie){
         dummyMovie.draw(0, 0, ofGetWidth(), ofGetHeight());
     }
     ofScale(ofGetWidth()/MACBOOKPRO_W, ofGetHeight()/MACBOOKPRO_H);
+    ofPushMatrix();
+    if(i_WindowMode == 0)ofScale(MACBOOKPRO_W/ofGetWidth(), MACBOOKPRO_H/ofGetHeight());
     for(int i = 0; i<v_ObjectPanel.size(); i++){
         v_ObjectPanel[i].draw();
     }
+    ofPopMatrix();
     ofPushStyle();
     if(i_WindowMode==0){
         ofEnableAlphaBlending();
@@ -988,6 +992,7 @@ void ofApp::draw(){
     ofPopStyle();
     objectCountdown.draw();
     ofPopMatrix();
+    
     objectPanel2.draw();
     ofPopStyle();
     ofPopMatrix();
