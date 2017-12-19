@@ -372,6 +372,18 @@ void ofApp::setup(){
     i_PanelColorMode = 0;
     
     timeline.setup();
+    
+    soundShoot.load("se/shyuin.wav");
+    //soundShoot.load("se/shot_effect.wav");
+    soundShoot.setLoop(false);
+    soundShoot.setVolume(1.0);
+    soundPanelCrash.load("se/wareru.wav");
+    soundPanelCrash.setLoop(false);
+    soundPanelCrash.setVolume(1.0);
+    soundRing.load("se/ring.wav");
+    soundRing.setLoop(false);
+    soundRing.setVolume(1.0);
+    
 }
 
 //update--------------------------------------------------------------
@@ -476,6 +488,7 @@ void ofApp::update(){
             objectRing.init();
         }
         if(v_ScheduleSeg[i_NowScheduleId].s_Name=="fly cg fail right" or v_ScheduleSeg[i_NowScheduleId].s_Name=="fly cg fail left"){
+            soundShoot.play();
             if(i_WindowMode == 0){
                 i_Camera = 0;
             }else{
@@ -496,6 +509,7 @@ void ofApp::update(){
         }
 
         if(v_ScheduleSeg[i_NowScheduleId].s_Name=="fly cg right" or v_ScheduleSeg[i_NowScheduleId].s_Name=="fly cg left"){
+            soundShoot.play();
             i_Camera = 3;
             modelGoalBall.clearPose();
             modelBall.clearPose();
@@ -515,6 +529,7 @@ void ofApp::update(){
             ofxOscMessage m;
             m.setAddress("/between/panelcrash");
             sendBetweenLR.sendMessage(m);
+            soundPanelCrash.play();
 
             i_AutoNextFlyingBallFail = 1;
         }
@@ -616,6 +631,7 @@ void ofApp::update(){
                 ofxOscMessage m3;
                 m3.setAddress("/between/panelcrash");
                 sendBetweenLR.sendMessage(m3);
+                soundPanelCrash.play();
                 {
                     ofxOscMessage m;
                     m.setAddress("/between/scene");
@@ -681,6 +697,14 @@ void ofApp::update(){
         if(v_ScheduleSeg[i_NowScheduleId].s_Name=="fly game audience" and b_Continue){
             if(i_AutoNextFlyingGameBall > 0){
                 i_AutoNextFlyingGameBall ++;
+                if(i_AutoNextFlyingGameBall == (133 - 3) or
+                   i_AutoNextFlyingGameBall == (254 - 3) or
+                   i_AutoNextFlyingGameBall == (381 - 3) or
+                   i_AutoNextFlyingGameBall == (510 - 3) or
+                   i_AutoNextFlyingGameBall == (632 - 3)
+                   ){
+                    soundRing.play();
+                }
                 if(i_AutoNextFlyingGameBall == 633){
                     {
                         ofxOscMessage m;
@@ -1414,6 +1438,7 @@ void ofApp::keyPressed(int key){
             modelBall.throwTo(ofVec3f(0,COURT_HEIGHT_HALF,GOAL_HEIGHT+99),10.4);
             break;
         case OF_KEY_RETURN:
+            bgm1.play();
             b_Black = false;
             b_AutomatorOn = true;
             scheduleChange();
@@ -1465,7 +1490,7 @@ void ofApp::keyPressed(int key){
             i_RightLimitNum = ofClamp(i_RightLimitNum-1, 0, RIGHT_POS_NUM);
             break;
         case '8':
-            i_RightLimitNum = ofClamp(i_RightLimitNum+1, 0, RIGHT_POS_NUM);
+            i_RightLimitNum = ofClamp(i_RightLimitNum+20, 0, RIGHT_POS_NUM);
             break;
         /*case '3':
             i_SceneID = 3;

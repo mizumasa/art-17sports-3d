@@ -217,6 +217,9 @@ public:
     //ofSoundPlayer bgm2;
     //ofSoundPlayer bgm3;
     ofSoundPlayer buzzer;
+    ofSoundPlayer soundShoot;
+    ofSoundPlayer soundPanelCrash;
+    ofSoundPlayer soundRing;
     vector<ofxObjectPanel> v_ObjectPanel;
     ofxObjectPanels2 objectPanel2;
     ofxObjectFrame objectFrame;
